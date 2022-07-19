@@ -1,23 +1,20 @@
-from tracemalloc import start
 from State import State
 import random as rd
 from Person import Person
 from typing import List, Tuple
+from constants import *
 
 
 class Board:
     def __init__(
         self,
         dimensions: Tuple[int, int],
-        border: int,
-        cell_dimensions: Tuple[int, int],
         player_role: str,
     ):
         self.rows = dimensions[0]
         self.columns = dimensions[1]
-        self.display_border = border
-        self.display_cell_dimensions = cell_dimensions
-        self.Player_Role = player_role
+        self.player_role = player_role
+        self.player_role_num = ROLE_TO_ROLE_NUM[player_role]
         self.population = 0
         self.States = []
         self.QTable = []
@@ -149,12 +146,9 @@ class Board:
     def clone(self, L: List[State], role: str):
         NB = Board(
             (self.rows, self.columns),
-            self.display_border,
-            self.display_cell_dimensions,
-            self.Player_Role,
+            self.player_role,
         )
         NB.States = [state.clone() for state in L]
-        NB.Player_Role = role
         return NB
 
     def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
@@ -217,12 +211,12 @@ class Board:
         return self.move(coords, new_coords)
 
     def QGreedyat(self, state_id: int):
-        biggest = self.QTable[state_id][0] * self.Player_Role
+        biggest = self.QTable[state_id][0] * self.player_role_num
         ind = 0
         A = self.QTable[state_id]
         i = 0
         for qval in A:
-            if (qval * self.Player_Role) > biggest:
+            if (qval * self.player_role_num) > biggest:
                 biggest = qval
                 ind = i
             i += 1
@@ -234,7 +228,7 @@ class Board:
         if r < L:
             return self.QGreedyat(state_id)
         else:
-            if self.Player_Role == 1:  # Player is Govt
+            if self.player_role_num == 1:  # Player is Govt
                 d = rd.randint(0, 4)
             else:
                 d = rd.randint(0, 5)
@@ -259,7 +253,7 @@ class Board:
                         sid = x
             return self.QGreedyat(sid)
         else:
-            if self.Player_Role == -1:  # Player is Govt
+            if self.player_role_num == -1:  # Player is Govt
                 d = rd.randint(0, len(self.States))
                 while self.States[d].person is None or self.States[d].person.isZombie:
                     d = rd.randint(0, len(self.States))
@@ -341,12 +335,6 @@ class Board:
                 ):
                     rs = rd.randrange(0, len(self.States) - 1)
 
-            # random state and value
-        # old_value = QTable[state][acti]
-        # next_max = np.max(QTable[next_state])
-        # new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
-        # QTable[state][acti] = new_value
-
     def populate(self):
         total = rd.randint(7, ((self.rows * self.columns) / 3))
         poss = []
@@ -366,3 +354,22 @@ class Board:
                 s = rd.randint(0, len(poss) - 1)
             self.States[poss[s]].person.isZombie = True
             used.append(s)
+
+    @property
+    def over(self):
+        return not self.containsPerson(True) or not self.containsPerson(False)
+
+    @property
+    def won(self):
+        return not self.containsPerson(not ROLE_TO_ROLE_BOOLEAN[self.player_role])
+
+    @staticmethod
+    def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
+        if coord2[1] > coord1[1]:
+            return "moveDown"
+        elif coord2[1] < coord1[1]:
+            return "moveUp"
+        elif coord2[0] > coord1[0]:
+            return "moveRight"
+        elif coord2[0] < coord1[0]:
+            return "moveLeft"

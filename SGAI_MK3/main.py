@@ -1,23 +1,13 @@
-import pygame
-from Board import Board
-import PygameFunctions as PF
-import random as rd
+from Game import Game
+from constants import *
 
-# Constants
-ROWS = 6
-COLUMNS = 6
-BORDER = 150  # Number of pixels to offset grid to the top-left side
-CELL_DIMENSIONS = (100, 100)  # Number of pixels (x,y) for each cell
-ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
-SELF_PLAY = True  # whether or not a human will be playing
 
 # Player role variables
+SELF_PLAY = True  # whether or not a human will be playing
 player_role = "Government"  # Valid options are "Government" and "Zombie"
-roleToRoleNum = {"Government": 1, "Zombie": -1}
-roleToRoleBoolean = {"Government": False, "Zombie": True}
-
+"""
 # Create the game board
-GameBoard = Board((ROWS, COLUMNS), BORDER, CELL_DIMENSIONS, roleToRoleNum[player_role])
+GameBoard = Board((ROWS, COLUMNS), BORDER, CELL_DIMENSIONS, player_role)
 GameBoard.populate()
 
 # Self play variables
@@ -26,16 +16,13 @@ gamma = 0.6
 epsilon = 0.1
 epochs = 1000
 epochs_ran = 0
-Original_Board = GameBoard.clone(GameBoard.States, GameBoard.Player_Role)
+Original_Board = GameBoard.clone(GameBoard.States, GameBoard.Player_Role)"""
 
+myGame = Game("human")
+myGame.start()
 
 # Initialize variables
-running = True
-take_action = []
-playerMoved = False
-font = pygame.font.SysFont("Comic Sans", 20)
-
-
+"""
 while running:
     P = PF.run(GameBoard)
 
@@ -65,7 +52,7 @@ while running:
                             if (
                                 GameBoard.States[idx].person is not None
                                 and GameBoard.States[idx].person.isZombie
-                                == roleToRoleBoolean[player_role]
+                                == ROLE_TO_ROLE_BOOLEAN[player_role]
                             ):
                                 take_action.append("move")
                             else:
@@ -76,13 +63,6 @@ while running:
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
-
-        # Display the current action
-        PF.screen.blit(
-            font.render("Your move is currently:", True, PF.WHITE),
-            (800, 400),
-        )
-        PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
 
         # Action handling
         if len(take_action) > 1:
@@ -208,3 +188,4 @@ while running:
                 print("loseCase")
             if event.type == pygame.QUIT:
                 running = False
+"""
