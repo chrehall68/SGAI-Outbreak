@@ -61,6 +61,7 @@ def run(GameBoard: Board):
     # Draw the heal icon
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_resources(GameBoard.resources)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_people(GameBoard)
@@ -77,6 +78,21 @@ def display_reset_move_button():
     )
     pygame.draw.rect(screen, BLACK, rect)
     screen.blit(font.render("Reset move?", True, WHITE), RESET_MOVE_COORDS)
+
+
+def display_resources(resources):
+    screen.blit(
+        font.render(f"You have {resources.resources} resources", True, WHITE),
+        (800, 700),
+    )
+    screen.blit(
+        font.render(
+            f"cures cost {resources.costs['cure']}, vax costs {resources.costs['vaccinate']}",
+            True,
+            WHITE,
+        ),
+        (800, 750),
+    )
 
 
 def display_image(
