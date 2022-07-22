@@ -319,6 +319,8 @@ class Board:
             p.kill_me()
             self.States[i].person = None
             p = None
+        else:
+            return [False, None]
         
         return [True, i]
 
