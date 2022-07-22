@@ -33,6 +33,9 @@ class Person:
         self.isZombie = False
         self.wasCured = True
 
+    def kill_me (self):
+        pass
+
     def update(self):
         return True
 

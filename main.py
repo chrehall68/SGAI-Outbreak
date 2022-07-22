@@ -37,7 +37,8 @@ while running:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
                 action = PF.get_action(GameBoard, x, y)
-                if action == "heal" or action == "bite":
+                
+                if action == "heal" or action == "bite" or action == "kill":
                     # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                     if len(take_action) == 0:
                         take_action.append(action)
@@ -61,7 +62,15 @@ while running:
 
                         # don't allow duplicate cells
                         if action not in take_action:
-                            take_action.append(action)
+                            # prevent players from moving in invalid spaces
+                            if take_action[0]=="move" and len(take_action)==2: 
+                                print("hi")
+                                curr_x, curr_y = take_action[1]
+                                new_x, new_y = action
+                                if (new_x==curr_x and curr_y==new_y+1) or (new_x==curr_x and curr_y==new_y-1) or (new_x==curr_x+1 and curr_y==new_y) or (new_x==curr_x-1 and curr_y==new_y):
+                                    take_action.append(action)
+                            else:
+                                take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
 
@@ -77,7 +86,7 @@ while running:
                         playerMoved = True
                     take_action = []
 
-            elif take_action[0] == "heal" or take_action[0] == "bite":
+            elif take_action[0] == "heal" or take_action[0] == "bite" or take_action[0]=="kill":
                 result = GameBoard.actionToFunction[take_action[0]](take_action[1])
                 if result[0] is not False:
                     playerMoved = True

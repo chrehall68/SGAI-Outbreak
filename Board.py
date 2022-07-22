@@ -29,6 +29,7 @@ class Board:
             "moveRight": self.moveRight,
             "heal": self.heal,
             "bite": self.bite,
+            "kill": self.kill
         }
 
     def num_zombies(self) -> int:
@@ -298,6 +299,22 @@ class Board:
             p.get_cured()
         else:
             return [False, None]
+        
+        return [True, i]
+
+    def kill(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        """
+        KILLS ZOMBIE
+        """
+        i = self.toIndex(coords)
+        if self.States[i].person is None:
+            return [False, None]
+        p = self.States[i].person
+
+        if p.isZombie:
+            p.kill_me()
+            self.States[i].person = None
+            p = None
         
         return [True, i]
 

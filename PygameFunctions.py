@@ -26,6 +26,12 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= CURE_BITE_COORDS[1]
         and pixel_y <= CURE_BITE_COORDS[1] + CURE_BITE_DIMS[1]
     )
+    kill_check = (
+        pixel_x >= KILL_COORDS[0]
+        and pixel_x <= KILL_COORDS[0] + CURE_BITE_DIMS[0]
+        and pixel_y >= KILL_COORDS[1]
+        and pixel_y <= KILL_COORDS[1] + CURE_BITE_DIMS[1]
+    )
     reset_move_check = (
         pixel_x >= RESET_MOVE_COORDS[0]
         and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
@@ -45,6 +51,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         if GameBoard.player_role == "Government":
             return "heal"
         return "bite"
+    elif kill_check:
+        return "kill"
     elif reset_move_check:
         return "reset move"
     elif move_check:
@@ -61,6 +69,7 @@ def run(GameBoard: Board):
     # Draw the heal icon
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_image(screen, "Assets/KillButton2.png", CURE_BITE_DIMS, KILL_COORDS)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_people(GameBoard)
