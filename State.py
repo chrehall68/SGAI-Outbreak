@@ -16,7 +16,6 @@ class State:
         b = second_coord[1] - first_coord[1]
         a = a * a
         b = b * b
-        print(a+b)
         return math.sqrt(a + b)
 
     def nearest_zombie(self, GameBoard):
