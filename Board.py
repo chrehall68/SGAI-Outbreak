@@ -311,7 +311,11 @@ class Board:
             return [False, None]
         p = self.States[i].person
 
-        if p.isZombie:
+        personAdjacent = False
+        for state in self.States[i].get_adj_states(self):
+            if state != None and state.person != None and not state.person.isZombie:
+                personAdjacent = True
+        if p.isZombie and personAdjacent:
             p.kill_me()
             self.States[i].person = None
             p = None
