@@ -1,3 +1,4 @@
+from Resources import Resources
 from State import State
 import random as rd
 from Person import Person
@@ -30,14 +31,20 @@ class Board:
             "heal": self.heal,
             "bite": self.bite,
         }
+        self.resources = Resources(4)
+
+    def count_people(self, isZombie: bool) -> int:
+        ret = 0
+        for state in self.States:
+            if state.person is not None and state.person.isZombie == isZombie:
+                ret += 1
+        return ret
 
     def num_zombies(self) -> int:
-        r = 0
-        for state in self.States:
-            if state.person != None:
-                if state.person.isZombie:
-                    r += 1
-        return r
+        return self.count_people(True)
+
+    def num_people(self) -> int:
+        return self.count_people(False)
 
     def act(self, oldstate: Tuple[int, int], givenAction: str):
         cell = self.toCoord(oldstate)
@@ -105,8 +112,16 @@ class Board:
                 state = self.States[idx]
                 if state.person is not None:
                     changed_states = False
-                    if action == "heal" and (
-                        state.person.isZombie or not state.person.isVaccinated
+                    if (
+                        action == "heal"
+                        and (state.person.isZombie or not state.person.isVaccinated)
+                        and (
+                            (state.person.isZombie and B.resources.spendOn("cure"))
+                            or (
+                                not state.person.isVaccinated
+                                and B.resources.spendOn("vaccinate")
+                            )
+                        )
                     ):
                         poss.append(B.toCoord(idx))
                         changed_states = True
@@ -126,6 +141,7 @@ class Board:
                             else B.States[i]
                             for i in range(len(self.States))
                         ]
+                        B.resources = self.resources.clone()
         return poss
 
     def toCoord(self, i: int):
@@ -149,6 +165,7 @@ class Board:
         )
         NB.States = [state.clone() for state in L]
         NB.player_role = role
+        NB.resources = self.resources.clone()
         return NB
 
     def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
@@ -291,9 +308,15 @@ class Board:
         p = self.States[i].person
 
         if p.isZombie:
-            p.get_cured()
+            if self.resources.spendOn("cure"):
+                p.get_cured()
+            else:
+                return [False, i]
         else:
-            p.get_vaccinated()
+            if self.resources.spendOn("vaccinate"):
+                p.get_vaccinated()
+            else:
+                return [False, i]
         return [True, i]
 
     def get_possible_states(self, role_number: int):
@@ -360,3 +383,5 @@ class Board:
         """
         for state in self.States:
             state.update()
+
+        self.resources.update(self.num_people())
