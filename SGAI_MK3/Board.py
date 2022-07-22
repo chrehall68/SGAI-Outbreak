@@ -112,8 +112,16 @@ class Board:
                 state = self.States[idx]
                 if state.person is not None:
                     changed_states = False
-                    if action == "heal" and (
-                        state.person.isZombie or not state.person.isVaccinated
+                    if (
+                        action == "heal"
+                        and (state.person.isZombie or not state.person.isVaccinated)
+                        and (
+                            (state.person.isZombie and B.resources.spendOn("cure"))
+                            or (
+                                not state.person.isVaccinated
+                                and B.resources.spendOn("vaccinate")
+                            )
+                        )
                     ):
                         poss.append(B.toCoord(idx))
                         changed_states = True
@@ -157,6 +165,7 @@ class Board:
         )
         NB.States = [state.clone() for state in L]
         NB.player_role = role
+        NB.resources = self.resources.clone()
         return NB
 
     def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
