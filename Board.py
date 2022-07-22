@@ -3,6 +3,7 @@ import random as rd
 from Person import Person
 from typing import List, Tuple
 from constants import *
+import constants
 
 
 class Board:
@@ -300,6 +301,8 @@ class Board:
         else:
             return [False, None]
         
+        constants.CURRENT_SCORE+=SCORE_VALUES["heal"]
+
         return [True, i]
 
     def kill(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
@@ -322,6 +325,8 @@ class Board:
         else:
             return [False, None]
         
+        constants.CURRENT_SCORE+=SCORE_VALUES["kill"]
+
         return [True, i]
 
     def get_possible_states(self, role_number: int):

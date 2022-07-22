@@ -2,7 +2,7 @@ from typing import List, Tuple
 import pygame
 from constants import *
 from Board import Board
-
+import constants
 
 # Initialize pygame
 screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
@@ -59,6 +59,11 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return board_x, board_y
     return None
 
+font = pygame.font.Font("freesansbold.ttf", 32)
+def display_text (text, coords):
+    score = font.render(text, True, (255,255,255))
+    screen.blit(score, coords)
+
 
 def run(GameBoard: Board):
     """
@@ -74,6 +79,10 @@ def run(GameBoard: Board):
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_people(GameBoard)
     display_reset_move_button()
+
+    # draw the score board
+    display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS)
+
     return pygame.event.get()
 
 
@@ -209,6 +218,7 @@ def display_win_screen():
         font.render("You win!", True, WHITE),
         (500, 400),
     )
+    display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS)
     pygame.display.update()
 
     # catch quit event

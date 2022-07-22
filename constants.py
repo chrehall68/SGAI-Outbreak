@@ -27,3 +27,11 @@ CURE_BITE_DIMS = (200, 100)
 CELL_DIMENSIONS = (100, 100)  # number of pixels (x, y) for each cell
 CUR_MOVE_COORDS = (800, 400)
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
+SCORE_DIMS = (200,100)
+SCORE_COORDS = (950, 650)
+CURRENT_SCORE = 0
+SCORE_VALUES = {
+    "heal":100,
+    "kill":100,
+    "move":0
+}
