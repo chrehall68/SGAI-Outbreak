@@ -64,7 +64,6 @@ while running:
                         if action not in take_action:
                             # prevent players from moving in invalid spaces
                             if take_action[0]=="move" and len(take_action)==2: 
-                                print("hi")
                                 curr_x, curr_y = take_action[1]
                                 new_x, new_y = action
                                 if (new_x==curr_x and curr_y==new_y+1) or (new_x==curr_x and curr_y==new_y-1) or (new_x==curr_x+1 and curr_y==new_y) or (new_x==curr_x-1 and curr_y==new_y):
