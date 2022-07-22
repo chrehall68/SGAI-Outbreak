@@ -62,6 +62,7 @@ def run(GameBoard: Board):
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
         display_resources(GameBoard.resources)
+        display_safe_zone(GameBoard.safeEdge)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_people(GameBoard)
@@ -94,6 +95,20 @@ def display_resources(resources):
         (800, 750),
     )
 
+def display_safe_zone(zone):
+    # Display the safe zone
+    SAFE_ZONE_COORDS = (10, 20)
+    screen.blit(
+        font.render("Safe zone:", True, WHITE),
+        SAFE_ZONE_COORDS,
+    )
+    screen.blit(
+        font.render(f"{zone}", True, WHITE),
+        (
+            SAFE_ZONE_COORDS[0],
+            SAFE_ZONE_COORDS[1] + font.size("Safe zone:")[1] * 2,
+        ),
+    )
 
 def display_image(
     screen: pygame.Surface,
