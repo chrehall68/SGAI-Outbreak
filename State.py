@@ -16,7 +16,7 @@ class State:
         b = second_coord[1] - first_coord[1]
         a = a * a
         b = b * a
-        return math.pow(int(a + b), 0.5)
+        return math.sqrt(a + b)
 
     def nearest_zombie(self, GameBoard):
         smallest_dist = 100
@@ -39,6 +39,16 @@ class State:
                 chance = 0.25
             reward = reward + int(5 * (2 + chance))
         return reward
+
+    def get_adj_states(self, GameBoard):
+        adj_states = []
+        for state in GameBoard.States:
+            if  state.location != None and self.distance(GameBoard, state.location) == 1:
+                adj_states.append(state)
+            else:
+                adj_states.append(None)
+        return adj_states
+
 
     def adjacent(self, GameBoard):
         newCoord = GameBoard.toCoord(self.location)
