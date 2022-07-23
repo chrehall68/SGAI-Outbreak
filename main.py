@@ -90,7 +90,7 @@ while running:
                 if result[0] is not False:
                     playerMoved = True
                 take_action = []
-
+                  
         # Computer turn
         if playerMoved:
             playerMoved = False
@@ -135,6 +135,7 @@ while running:
             GameBoard.actionToFunction[action](move_coord)
 
             # update the board's states
+            pygame.time.wait(1000)
             GameBoard.update()
 
         # Update the display
