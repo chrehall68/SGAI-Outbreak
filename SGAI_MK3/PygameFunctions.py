@@ -32,6 +32,12 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= RESET_MOVE_COORDS[1]
         and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
     )
+    wall_check = (
+        pixel_x >= WALL_BUTTON_COORDS[0]
+        and pixel_x <= WALL_BUTTON_COORDS[0] + WALL_BUTTON_DIMS[0]
+        and pixel_y >= WALL_BUTTON_COORDS[1]
+        and pixel_y <= WALL_BUTTON_COORDS[1] + WALL_BUTTON_DIMS[1]
+    )
     board_x = int((pixel_x - MARGIN) / CELL_DIMENSIONS[0])
     board_y = int((pixel_y - MARGIN) / CELL_DIMENSIONS[1])
     move_check = (
@@ -47,6 +53,9 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return "bite"
     elif reset_move_check:
         return "reset move"
+    elif wall_check:
+        if GameBoard.player_role == "Government":
+            return "wall"
     elif move_check:
         return board_x, board_y
     return None
@@ -61,6 +70,7 @@ def run(GameBoard: Board):
     # Draw the heal icon
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_people(GameBoard)
@@ -164,7 +174,7 @@ def build_grid(GameBoard: Board):
 
 def display_people(GameBoard: Board):
     """
-    Draw the people (government, vaccinated, and zombies) on the grid.
+    Draw the people (government, vaccinated, zombies, and walls) on the grid.
     """
     for x in range(len(GameBoard.States)):
         if GameBoard.States[x].person != None:
@@ -179,6 +189,12 @@ def display_people(GameBoard: Board):
                 int(x / GameBoard.columns) * CELL_DIMENSIONS[1] + MARGIN + 20,
             )
             display_image(screen, char, (35, 60), coords)
+        elif GameBoard.States[x].wall is not None:
+            coords = (
+                int(x % GameBoard.rows) * CELL_DIMENSIONS[0] + MARGIN,
+                int(x / GameBoard.columns) * CELL_DIMENSIONS[1] + MARGIN
+            )
+            display_wall(coords)
 
 
 def display_cur_move(cur_move: List):
@@ -235,3 +251,9 @@ def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
         return "moveRight"
     elif coord2[0] < coord1[0]:
         return "moveLeft"
+
+def display_wall(coords):
+    dims = (CELL_DIMENSIONS[0] - LINE_WIDTH, CELL_DIMENSIONS[1] - LINE_WIDTH)
+    new_coords = (coords[0] + LINE_WIDTH, coords[1] + LINE_WIDTH)
+    display_image(screen, "Assets/wall.jpg", dims, new_coords)
+

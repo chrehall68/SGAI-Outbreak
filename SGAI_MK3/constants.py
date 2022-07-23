@@ -1,7 +1,7 @@
 # Constants
 ROWS = 6
 COLUMNS = 6
-ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
+ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite", "wall"]
 
 # Player role variables
 ROLE_TO_ROLE_NUM = {"Government": 1, "Zombie": -1}
@@ -26,3 +26,9 @@ CURE_BITE_DIMS = (200, 200)
 CELL_DIMENSIONS = (100, 100)  # number of pixels (x, y) for each cell
 CUR_MOVE_COORDS = (800, 400)
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
+WALL_BUTTON_DIMS = (200, 50)
+WALL_BUTTON_COORDS = (800, 700)
+
+# logic constants
+MIN_WALL_DURATION = 1
+MAX_WALL_DURATION = 3
