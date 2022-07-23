@@ -45,9 +45,59 @@ class State:
         for state in GameBoard.States:
             if  state.location != None and self.distance(GameBoard, state.location) == 1:
                 adj_states.append(state)
-            else:
-                adj_states.append(None)
         return adj_states
+
+    def get_direction_to(self, other_state, GameBoard):
+        self_coords = GameBoard.toCoord(self.location)
+        other_coords = GameBoard.toCoord(other_state.location)
+        
+        dir = "On Same State"
+        if other_coords[0] == self_coords[0] + 1:
+            dir = "moveRight"
+        elif other_coords[0] == self_coords[0] - 1:
+            dir = "moveLeft"
+        elif other_coords[1] == self_coords[1] + 1:
+            dir = "moveUp"
+        elif other_coords[1] == self_coords[1] - 1:
+            dir = "moveDown"
+        return dir
+
+    def get_possible_moves(self, GameBoard):
+        adj_states = self.get_adj_states(GameBoard)
+        poss_acts = []
+
+        
+        for state in adj_states:
+            if state.person != None:
+                adj_states.remove(state)
+        
+        for state in adj_states:
+            state_coords = GameBoard.toCoord(state.location)
+            self_coords = GameBoard.toCoord(self.location)
+            if state_coords[0] == self_coords[0] + 1:
+                poss_acts.append("moveRight")
+            elif state_coords[0] == self_coords[0] - 1:
+                poss_acts.append("moveLeft")
+            elif state_coords[1] == self_coords[1] + 1:
+                poss_acts.append("moveUp")
+            elif state_coords[1] == self_coords[1] - 1:
+                poss_acts.append("moveDown")
+        return poss_acts
+            
+            
+
+    def get_nearest_person(self, GameBoard):
+        people_states = []
+        for state in GameBoard.States:
+            if state.person != None and not state.person.isZombie:
+                people_states.append(state)
+        dist = 100
+        nearest_person_state = None
+        for person in people_states:
+            if self.distance(GameBoard, person.location) < dist:
+                dist = self.distance(GameBoard, person.location)
+                nearest_person_state = person
+        return [nearest_person_state, dist]
 
 
     def adjacent(self, GameBoard):

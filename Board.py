@@ -328,6 +328,46 @@ class Board:
         constants.CURRENT_SCORE+=SCORE_VALUES["kill"]
 
         return [True, i]
+    def heuristic_action(self, optimum_state):
+        nearest_person_info = optimum_state.get_nearest_person(self)
+        if nearest_person_info[1] == 1:
+            return "bite"
+        
+        person_is_isolated = True
+        poss_moves = optimum_state.get_possible_moves(self)
+        if nearest_person_info[0] == None:
+            return rd.choice(poss_moves)
+
+        for state in nearest_person_info[0].get_adj_states(self):
+            if state.person != None and state.person.isZombie == False:
+                person_is_isolated = False
+        from_opt_to_person = optimum_state.get_direction_to(nearest_person_info[0], self)
+        if person_is_isolated and from_opt_to_person in poss_moves:
+            return from_opt_to_person
+        else:
+            if from_opt_to_person in poss_moves:
+                poss_moves.remove(from_opt_to_person)
+            return rd.choice(poss_moves)
+            
+
+        
+    def heuristic_state(self):
+        zombie_states = []
+        for state in self.States:
+            if state.person != None and state.person.isZombie == True:
+                zombie_states.append(state)
+        optimum_zombie_state = zombie_states[0]
+        dist = 100
+        for state in zombie_states:
+            if len(state.get_possible_moves(self)) <= 0:
+                zombie_states.remove(state)
+        for state in zombie_states:
+            nearest_person = state.get_nearest_person(self)
+            if nearest_person[1] < dist:
+                dist = nearest_person[1]
+                optimum_zombie_state = state
+        return optimum_zombie_state
+
 
     def get_possible_states(self, role_number: int):
         indexes = []

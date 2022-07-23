@@ -119,6 +119,18 @@ while running:
             # Select the destination coordinates
             move_coord = rd.choice(possible_move_coords)
 
+            #Override Q-Choice with Heuristics if heuristic zombies is true
+            HeuristicZombies = True
+            if HeuristicZombies:
+                optimum_state = GameBoard.heuristic_state()
+                move_coord = GameBoard.toCoord(optimum_state.location)
+                
+                action = GameBoard.heuristic_action(optimum_state)
+                print(move_coord)
+                print(action)
+                if action == "bite":
+                    optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
+                    move_coord = GameBoard.toCoord(optimum_state.location)
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
 
