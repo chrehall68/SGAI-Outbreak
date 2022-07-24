@@ -24,6 +24,7 @@ Original_Board = GameBoard.clone(GameBoard.States, GameBoard.player_role)
 running = True
 take_action = []
 playerMoved = False
+justStarted = True
 
 while running:
     P = PF.run(GameBoard)
@@ -86,7 +87,16 @@ while running:
                     take_action = []
                     continue
 
-            elif take_action[0] == "heal" or take_action[0] == "bite" or take_action[0]=="kill":
+            elif take_action[0] == "heal" or take_action[0]=="kill":
+                if GameBoard.num_zombies() > 1 or not justStarted:
+                    justStarted = False
+                    result = GameBoard.actionToFunction[take_action[0]](take_action[1])
+                    if result[0] is not False:
+                        playerMoved = True
+                    take_action = []
+                    continue
+
+            elif take_action[0] == "bite":
                 result = GameBoard.actionToFunction[take_action[0]](take_action[1])
                 if result[0] is not False:
                     playerMoved = True
@@ -226,3 +236,4 @@ while running:
                 print("loseCase")
             if event.type == pygame.QUIT:
                 running = False
+print(take_action)
