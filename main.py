@@ -69,6 +69,8 @@ while running:
                                 new_x, new_y = action
                                 if (new_x==curr_x and curr_y==new_y+1) or (new_x==curr_x and curr_y==new_y-1) or (new_x==curr_x+1 and curr_y==new_y) or (new_x==curr_x-1 and curr_y==new_y):
                                     take_action.append(action)
+                                else:
+                                    take_action = []
                             else:
                                 take_action.append(action)
             if event.type == pygame.QUIT:
@@ -95,6 +97,8 @@ while running:
                         playerMoved = True
                     take_action = []
                     continue
+                else:
+                    take_action = []
 
             elif take_action[0] == "bite":
                 result = GameBoard.actionToFunction[take_action[0]](take_action[1])
