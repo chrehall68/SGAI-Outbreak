@@ -151,17 +151,18 @@ while running:
             HeuristicZombies = True
             if HeuristicZombies:
                 optimum_state = GameBoard.heuristic_state()
-                move_coord = GameBoard.toCoord(optimum_state.location)
-                
-                action = GameBoard.heuristic_action(optimum_state)
-                if action == "bite":
-                    prev_state = optimum_state
-                    optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
+                if optimum_state != False:
                     move_coord = GameBoard.toCoord(optimum_state.location)
-                    GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
-                else:
-                    # Implement the selected action
-                    GameBoard.actionToFunction[action](move_coord)
+                    
+                    action = GameBoard.heuristic_action(optimum_state)
+                    if action == "bite":
+                        prev_state = optimum_state
+                        optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
+                        move_coord = GameBoard.toCoord(optimum_state.location)
+                        GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+                    else:
+                        # Implement the selected action
+                        GameBoard.actionToFunction[action](move_coord)
             
 
             # update the board's states

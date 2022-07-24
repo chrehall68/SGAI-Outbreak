@@ -361,6 +361,8 @@ class Board:
         for state in self.States:
             if state.person != None and state.person.isZombie == True and state.person.zombieStage >= 2:
                 zombie_states.append(state)
+        if len(zombie_states) == 0:
+            return False
         optimum_zombie_state = zombie_states[0]
         dist = 100
         for state in zombie_states:
