@@ -138,8 +138,6 @@ while running:
                 move_coord = GameBoard.toCoord(optimum_state.location)
                 
                 action = GameBoard.heuristic_action(optimum_state)
-                print(move_coord)
-                print(action)
                 if action == "bite":
                     optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
                     move_coord = GameBoard.toCoord(optimum_state.location)

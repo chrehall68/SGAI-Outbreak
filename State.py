@@ -43,7 +43,15 @@ class State:
     def get_adj_states(self, GameBoard):
         adj_states = []
         for state in GameBoard.States:
-            if  state.location != None and self.distance(GameBoard, state.location) == 1:
+            self_coords = GameBoard.toCoord(self.location)
+            other_coords = GameBoard.toCoord(state.location)
+            if other_coords[0] == self_coords[0] + 1 and other_coords[1] == self_coords[1]:
+                adj_states.append(state)
+            elif other_coords[0] == self_coords[0] - 1 and other_coords[1] == self_coords[1]:
+                adj_states.append(state)
+            elif other_coords[1] == self_coords[1] + 1 and other_coords[0] == self_coords[0]:
+                adj_states.append(state)
+            elif other_coords[1] == self_coords[1] - 1 and other_coords[0] == self_coords[0]:
                 adj_states.append(state)
         return adj_states
 
@@ -56,32 +64,40 @@ class State:
             dir = "moveRight"
         elif other_coords[0] == self_coords[0] - 1:
             dir = "moveLeft"
-        elif other_coords[1] == self_coords[1] + 1:
-            dir = "moveUp"
         elif other_coords[1] == self_coords[1] - 1:
+            dir = "moveUp"
+        elif other_coords[1] == self_coords[1] + 1:
             dir = "moveDown"
         return dir
 
     def get_possible_moves(self, GameBoard):
         adj_states = self.get_adj_states(GameBoard)
-        poss_acts = []
+        poss_acts = ["moveRight", "moveLeft", "moveUp", "moveDown"]
 
-        
         for state in adj_states:
             if state.person != None:
-                adj_states.remove(state)
+                self_coords = GameBoard.toCoord(self.location)
+                other_coords = GameBoard.toCoord(state.location)
+                
+                if other_coords[0] == self_coords[0] + 1:
+                    poss_acts.remove("moveRight")
+                elif other_coords[0] == self_coords[0] - 1:
+                    poss_acts.remove("moveLeft")
+                elif other_coords[1] == self_coords[1] - 1:
+                    poss_acts.remove("moveUp")
+                elif other_coords[1] == self_coords[1] + 1:
+                    poss_acts.remove("moveDown")
         
-        for state in adj_states:
-            state_coords = GameBoard.toCoord(state.location)
-            self_coords = GameBoard.toCoord(self.location)
-            if state_coords[0] == self_coords[0] + 1:
-                poss_acts.append("moveRight")
-            elif state_coords[0] == self_coords[0] - 1:
-                poss_acts.append("moveLeft")
-            elif state_coords[1] == self_coords[1] + 1:
-                poss_acts.append("moveUp")
-            elif state_coords[1] == self_coords[1] - 1:
-                poss_acts.append("moveDown")
+        self_coords = GameBoard.toCoord(self.location)
+        if self_coords[0] == 5 and "moveRight" in poss_acts:
+            poss_acts.remove("moveRight")
+        if self_coords[0] == 0 and "moveLeft" in poss_acts:
+            poss_acts.remove("moveLeft")
+        if self_coords[1] == 0 and "moveUp" in poss_acts:
+            poss_acts.remove("moveUp")
+        if self_coords[1] == 5 and "moveDown" in poss_acts:
+            poss_acts.remove("moveDown")
+
         return poss_acts
             
             

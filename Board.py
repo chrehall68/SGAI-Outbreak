@@ -345,7 +345,7 @@ class Board:
         if person_is_isolated and from_opt_to_person in poss_moves:
             return from_opt_to_person
         else:
-            if from_opt_to_person in poss_moves:
+            if from_opt_to_person in poss_moves and len(poss_moves) > 1:
                 poss_moves.remove(from_opt_to_person)
             return rd.choice(poss_moves)
             
