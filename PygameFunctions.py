@@ -73,8 +73,8 @@ def run(GameBoard: Board):
     build_grid(GameBoard)  # Draw the grid
     # Draw the heal icon
     if GameBoard.player_role == "Government":
-        display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
-        display_image(screen, "Assets/KillButton2.png", CURE_BITE_DIMS, KILL_COORDS)
+        display_image(screen, "Assets/heart icon.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_image(screen, "Assets/skull icon.png", CURE_BITE_DIMS, KILL_COORDS)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_people(GameBoard)
