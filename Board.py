@@ -301,7 +301,7 @@ class Board:
         for state in self.States[i].get_adj_states(self):
             if state != None and state.person != None and not state.person.isZombie:
                 personAdjacent = True
-        if p.isZombie and personAdjacent:
+        if p.isZombie and personAdjacent and rd.random() > 0.25:
             p.get_cured()
         else:
             return [False, None]
@@ -336,7 +336,7 @@ class Board:
     def heuristic_action(self, optimum_state):
         nearest_person_info = optimum_state.get_nearest_person(self)
         if nearest_person_info[1] == 1:
-            return "bite"
+                return "bite"
         
         person_is_isolated = True
         poss_moves = optimum_state.get_possible_moves(self)
@@ -350,7 +350,7 @@ class Board:
         if person_is_isolated and from_opt_to_person in poss_moves:
             return from_opt_to_person
         else:
-            if from_opt_to_person in poss_moves:
+            if from_opt_to_person in poss_moves and len(poss_moves) > 1:
                 poss_moves.remove(from_opt_to_person)
             return rd.choice(poss_moves)
             
@@ -423,7 +423,7 @@ class Board:
             else:
                 self.States[x].person = None
         used = []
-        for x in range(1):
+        for x in range(4):
             s = rd.randint(0, len(poss) - 1)
             while s in used:
                 s = rd.randint(0, len(poss) - 1)

@@ -69,6 +69,8 @@ while running:
                                 new_x, new_y = action
                                 if (new_x==curr_x and curr_y==new_y+1) or (new_x==curr_x and curr_y==new_y-1) or (new_x==curr_x+1 and curr_y==new_y) or (new_x==curr_x-1 and curr_y==new_y):
                                     take_action.append(action)
+                                else:
+                                    take_action = []
                             else:
                                 take_action.append(action)
             if event.type == pygame.QUIT:
@@ -97,6 +99,8 @@ while running:
                     take_action = []
                     GameBoard.updateMovesSinceTransformation()
                     continue
+                else:
+                    take_action = []
 
             elif take_action[0] == "bite":
                 result = GameBoard.actionToFunction[take_action[0]](take_action[1])
@@ -150,8 +154,6 @@ while running:
                 move_coord = GameBoard.toCoord(optimum_state.location)
                 
                 action = GameBoard.heuristic_action(optimum_state)
-                print(move_coord)
-                print(action)
                 if action == "bite":
                     prev_state = optimum_state
                     optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
