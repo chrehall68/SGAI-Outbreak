@@ -268,7 +268,7 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
-    def bite(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+    def bite(self, coords: Tuple[int, int], stage=3) -> Tuple[bool, int]:
         i = self.toIndex(coords)
         if (
             self.States[i].person is None
@@ -276,7 +276,12 @@ class Board:
             or not self.isAdjacentTo(coords, True)
         ):
             return [False, None]
-        self.States[i].person.get_bitten()
+        if stage==2:
+            if rd.random()<constants.STAGE_2_BITE_RATE:
+                self.States[i].person.get_bitten()
+        elif stage==3:
+            if rd.random()<constants.STAGE_3_BITE_RATE:
+                self.States[i].person.get_bitten()
         return [True, i]
 
     def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
@@ -354,7 +359,7 @@ class Board:
     def heuristic_state(self):
         zombie_states = []
         for state in self.States:
-            if state.person != None and state.person.isZombie == True:
+            if state.person != None and state.person.isZombie == True and state.person.zombieStage >= 2:
                 zombie_states.append(state)
         optimum_zombie_state = zombie_states[0]
         dist = 100
@@ -423,6 +428,7 @@ class Board:
             while s in used:
                 s = rd.randint(0, len(poss) - 1)
             self.States[poss[s]].person.isZombie = True
+            self.States[poss[s]].person.zombieStage = 3
             used.append(s)
 
     def update(self):
@@ -433,3 +439,8 @@ class Board:
         """
         for state in self.States:
             state.update()
+
+    def updateMovesSinceTransformation (self):
+        for state in self.States:
+            if state.person is not None:
+                state.person.updateMovesSinceTransformation()

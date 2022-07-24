@@ -188,7 +188,12 @@ def display_people(GameBoard: Board):
             p = GameBoard.States[x].person
             char = "Assets/" + IMAGE_ASSETS[0]
             if p.isZombie:
-                char = "Assets/" + IMAGE_ASSETS[2]
+                if p.zombieStage==1:
+                    char = "Assets/"+IMAGE_ASSETS[3]
+                elif p.zombieStage==2:
+                    char = "Assets/"+IMAGE_ASSETS[4]
+                else:
+                    char = "Assets/" + IMAGE_ASSETS[2]
             coords = (
                 int(x % GameBoard.rows) * CELL_DIMENSIONS[0] + MARGIN + 35,
                 int(x / GameBoard.columns) * CELL_DIMENSIONS[1] + MARGIN + 20,
