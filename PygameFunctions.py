@@ -82,7 +82,6 @@ def run(GameBoard: Board):
 
     # draw the score board
     display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS)
-
     return pygame.event.get()
 
 

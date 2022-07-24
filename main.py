@@ -3,6 +3,7 @@ from Board import Board
 import PygameFunctions as PF
 import random as rd
 from constants import *
+import time
 
 SELF_PLAY = True  # whether or not a human will be playing
 player_role = "Government"  # Valid options are "Government" and "Zombie"
@@ -26,7 +27,6 @@ playerMoved = False
 
 while running:
     P = PF.run(GameBoard)
-
     if SELF_PLAY:
         if not GameBoard.containsPerson(False):
             PF.display_lose_screen()
@@ -84,17 +84,27 @@ while running:
                     if result[0] is not False:
                         playerMoved = True
                     take_action = []
+                    continue
 
             elif take_action[0] == "heal" or take_action[0] == "bite" or take_action[0]=="kill":
                 result = GameBoard.actionToFunction[take_action[0]](take_action[1])
                 if result[0] is not False:
                     playerMoved = True
                 take_action = []
+                continue
 
         # Computer turn
+       
         if playerMoved:
             playerMoved = False
             take_action = []
+            GameBoard.update() # UPDATE BOARD BEFORE ZOMBIE MOVE SO THE DELAY CAN HAPPEN
+            pygame.display.update()
+            # PF.run(GameBoard) # do this to update display
+
+            time.sleep(1)
+            # pygame.time.delay(TIME_BETWEEN_ZOMBIE_MOVE)
+            
 
             # Make a list of all possible actions that the computer can take
             possible_actions = [
@@ -118,6 +128,8 @@ while running:
 
             # Select the destination coordinates
             move_coord = rd.choice(possible_move_coords)
+
+            
 
             #Override Q-Choice with Heuristics if heuristic zombies is true
             HeuristicZombies = True
