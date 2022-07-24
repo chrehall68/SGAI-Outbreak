@@ -17,6 +17,8 @@ IMAGE_ASSETS = [
     "person_normal.png",
     "person_vax.png",
     "person_zombie.png",
+    "zombie_stage_1.png",
+    "zombie_stage_2.png"
 ]
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (800, 600)
@@ -36,3 +38,11 @@ SCORE_VALUES = { # TEMPORARY VALUES
     "move":0
 }
 TIME_BETWEEN_ZOMBIE_MOVE = 1000 # ms
+
+CURE_SUCCESS_RATES = [1, .75, .5, .25] # these are temporary values
+
+NUM_MOVES_UNTIL_STAGE_2 = 5
+NUM_MOVES_UNTIL_STAGE_3 = 5
+
+STAGE_2_BITE_RATE = .5
+STAGE_3_BITE_RATE = 1

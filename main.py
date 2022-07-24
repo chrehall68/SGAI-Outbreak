@@ -85,6 +85,7 @@ while running:
                     if result[0] is not False:
                         playerMoved = True
                     take_action = []
+                    GameBoard.updateMovesSinceTransformation()
                     continue
 
             elif take_action[0] == "heal" or take_action[0]=="kill":
@@ -94,6 +95,7 @@ while running:
                     if result[0] is not False:
                         playerMoved = True
                     take_action = []
+                    GameBoard.updateMovesSinceTransformation()
                     continue
 
             elif take_action[0] == "bite":
@@ -151,10 +153,14 @@ while running:
                 print(move_coord)
                 print(action)
                 if action == "bite":
+                    prev_state = optimum_state
                     optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
                     move_coord = GameBoard.toCoord(optimum_state.location)
-            # Implement the selected action
-            GameBoard.actionToFunction[action](move_coord)
+                    GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+                else:
+                    # Implement the selected action
+                    GameBoard.actionToFunction[action](move_coord)
+            
 
             # update the board's states
             GameBoard.update()
