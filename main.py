@@ -39,10 +39,12 @@ while running:
                 x, y = pygame.mouse.get_pos()
                 action = PF.get_action(GameBoard, x, y)
                 
+            
                 if action == "heal" or action == "bite" or action == "kill":
                     # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                     if len(take_action) == 0:
                         take_action.append(action)
+                    PF.display_curr_action(action)
                 elif action == "reset move":
                     take_action = []
                 elif action is not None:

@@ -1,5 +1,6 @@
 from typing import List, Tuple
 import pygame
+from sqlalchemy import false
 from constants import *
 from Board import Board
 import constants
@@ -11,6 +12,8 @@ pygame.font.init()
 font = pygame.font.SysFont("Comic Sans", 20)
 screen.fill(BACKGROUND)
 
+HEART_SELECTED = False
+SKULL_SELECTED = False
 
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
@@ -59,6 +62,22 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return board_x, board_y
     return None
 
+def display_curr_action(act):
+    global HEART_SELECTED 
+    global SKULL_SELECTED   
+    
+    if act == "heal":
+        HEART_SELECTED = True
+        SKULL_SELECTED = False
+
+    elif act == "kill":
+        SKULL_SELECTED = True
+        HEART_SELECTED = False
+
+    else:
+        HEART_SELECTED = False
+        SKULL_SELECTED = False
+
 font = pygame.font.Font("freesansbold.ttf", 32)
 def display_text (text, coords):
     score = font.render(text, True, (255,255,255))
@@ -73,8 +92,19 @@ def run(GameBoard: Board):
     build_grid(GameBoard)  # Draw the grid
     # Draw the heal icon
     if GameBoard.player_role == "Government":
-        display_image(screen, "Assets/heart icon.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
-        display_image(screen, "Assets/skull icon.png", CURE_BITE_DIMS, KILL_COORDS)
+
+       
+        if HEART_SELECTED:
+            display_image(screen, "Assets/highlighted heart icon.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        else:
+            display_image(screen, "Assets/heart icon.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
+
+        if SKULL_SELECTED:
+            display_image(screen, "Assets/highlighted skull icon.png", CURE_BITE_DIMS, KILL_COORDS)
+        else:
+            display_image(screen, "Assets/skull icon.png", CURE_BITE_DIMS, KILL_COORDS)
+
+        
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_people(GameBoard)
