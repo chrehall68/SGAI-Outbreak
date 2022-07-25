@@ -318,7 +318,7 @@ class Board:
         If there is a zombie there, the person will be cured.
         If there is a person there, the person will be vaccinated
         If no person is selected, then return [False, None]
-        if a person is vaccined, then return [True, index]
+        if a person is vaccinated, then return [True, index]
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
@@ -326,13 +326,13 @@ class Board:
         p = self.States[i].person
 
         if p.isZombie:
-            if self.isAdjacentTo(coords, True): # zombie only cured if adjacent
+            if self.isAdjacentTo(coords, False): # zombie only cured if adjacent
                 if self.resources.spendOn("cure"):
                     chance = 0.8 # 80% chance of getting cured (for now, # can be changed)
                     if rd.random() < chance:
                         p.get_cured()
                     else: 
-                        #print("Cure Failed")
+                        print("Cure Failed")
                         return [False, None]
                 else:
                     return [False, None]
