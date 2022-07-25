@@ -61,16 +61,23 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return board_x, board_y
     return None
 
+def reset_images():
+    global HEART_SELECTED 
+    global SKULL_SELECTED  
+
+    HEART_SELECTED = False
+    SKULL_SELECTED = False
+
 def display_curr_action(act):
     global HEART_SELECTED 
     global SKULL_SELECTED   
     
     if act == "heal":
-        HEART_SELECTED = True
+        HEART_SELECTED = not HEART_SELECTED
         SKULL_SELECTED = False
 
     elif act == "kill":
-        SKULL_SELECTED = True
+        SKULL_SELECTED = not SKULL_SELECTED
         HEART_SELECTED = False
 
     else:
@@ -113,7 +120,6 @@ def run(GameBoard: Board):
     display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS)
     display_text(f"Last Move: TEMP VAR", LAST_MOVE_COORDS)
     return pygame.event.get()
-
 
 def display_reset_move_button():
     rect = pygame.Rect(

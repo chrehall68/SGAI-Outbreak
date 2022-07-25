@@ -44,9 +44,13 @@ while running:
                     # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                     if len(take_action) == 0:
                         take_action.append(action)
+                    else:
+                        take_action = []
+                        take_action.append(action)
                     PF.display_curr_action(action)
                 elif action == "reset move":
                     take_action = []
+                    PF.reset_images()
                 elif action is not None:
                     idx = GameBoard.toIndex(action)
                     # action is a coordinate
@@ -73,6 +77,7 @@ while running:
                                     take_action.append(action)
                                 else:
                                     take_action = []
+                                    PF.reset_images()
                             else:
                                 take_action.append(action)
             if event.type == pygame.QUIT:
@@ -104,6 +109,7 @@ while running:
                         if result[0] is not False:
                             playerMoved = True
                         take_action = []
+                        PF.reset_images()
                         GameBoard.updateMovesSinceTransformation()
                         continue
 
@@ -114,16 +120,19 @@ while running:
                         if result[0] is not False:
                             playerMoved = True
                         take_action = []
+                        PF.reset_images()
                         GameBoard.updateMovesSinceTransformation()
                         continue
                     else:
                         take_action = []
+                        PF.reset_images()
 
                 elif take_action[0] == "bite":
                     result = GameBoard.actionToFunction[take_action[0]](take_action[1])
                     if result[0] is not False:
                         playerMoved = True
                     take_action = []
+                    PF.reset_images()
                     continue
 
         # Computer turn
@@ -131,6 +140,7 @@ while running:
         if playerMoved:
             playerMoved = False
             take_action = []
+            PF.reset_images()
             GameBoard.update() # UPDATE BOARD BEFORE ZOMBIE MOVE SO THE DELAY CAN HAPPEN
             pygame.display.update()
             # PF.run(GameBoard) # do this to update display
@@ -244,6 +254,7 @@ while running:
                 print("winCase")
 
             take_action = []
+            PF.reset_images()
             print("Enemy turn")
             ta = ""
             if player_role == "Government":
