@@ -326,10 +326,18 @@ class Board:
         p = self.States[i].person
 
         if p.isZombie:
-            if self.resources.spendOn("cure"):
-                p.get_cured()
+            if self.isAdjacentTo(coords, True): # zombie only cured if adjacent
+                if self.resources.spendOn("cure"):
+                    chance = 0.8 # 80% chance of getting cured (for now, # can be changed)
+                    if rd.random() < chance:
+                        p.get_cured()
+                    else: 
+                        #print("Cure Failed")
+                        return [False, None]
+                else:
+                    return [False, None]
             else:
-                return [False, i]
+                return [False, None]
         else:
             if i in self.getSafeEdge():
                 if self.resources.spendOn("vaccinate"):
