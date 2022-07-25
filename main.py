@@ -6,7 +6,7 @@ from constants import *
 import time
 
 SELF_PLAY = True  # whether or not a human will be playing
-player_role = "Government"  # Valid options are "Government" and "Zombie"
+player_role = "Zombie"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
 GameBoard.populate()
@@ -79,35 +79,50 @@ while running:
         PF.display_cur_move(take_action)
 
         # Action handling
-        if len(take_action) > 1:
-            if take_action[0] == "move":
-                if len(take_action) > 2:
-                    directionToMove = PF.direction(take_action[1], take_action[2])
-                    result = GameBoard.actionToFunction[directionToMove](take_action[1])
-                    if result[0] is not False:
-                        playerMoved = True
-                    take_action = []
-                    GameBoard.updateMovesSinceTransformation()
-                    continue
+        if player_role == "Zombie":
+            optimum_state = GameBoard.heuristic_state()
+            if optimum_state != False:
+                move_coord = GameBoard.toCoord(optimum_state.location)
+                
+                action = GameBoard.heuristic_action(optimum_state)
+                if action == "bite":
+                    prev_state = optimum_state
+                    optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
+                    move_coord = GameBoard.toCoord(optimum_state.location)
+                    GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+                else:
+                    # Implement the selected action
+                    GameBoard.actionToFunction[action](move_coord)
+        else:
+            if len(take_action) > 1:
+                if take_action[0] == "move":
+                    if len(take_action) > 2:
+                        directionToMove = PF.direction(take_action[1], take_action[2])
+                        result = GameBoard.actionToFunction[directionToMove](take_action[1])
+                        if result[0] is not False:
+                            playerMoved = True
+                        take_action = []
+                        GameBoard.updateMovesSinceTransformation()
+                        continue
 
-            elif take_action[0] == "heal" or take_action[0]=="kill":
-                if GameBoard.num_zombies() > 1 or not justStarted:
-                    justStarted = False
+                elif take_action[0] == "heal" or take_action[0]=="kill":
+                    if GameBoard.num_zombies() > 1 or not justStarted:
+                        justStarted = False
+                        result = GameBoard.actionToFunction[take_action[0]](take_action[1])
+                        if result[0] is not False:
+                            playerMoved = True
+                        take_action = []
+                        GameBoard.updateMovesSinceTransformation()
+                        continue
+                    else:
+                        take_action = []
+
+                elif take_action[0] == "bite":
                     result = GameBoard.actionToFunction[take_action[0]](take_action[1])
                     if result[0] is not False:
                         playerMoved = True
                     take_action = []
-                    GameBoard.updateMovesSinceTransformation()
                     continue
-                else:
-                    take_action = []
-
-            elif take_action[0] == "bite":
-                result = GameBoard.actionToFunction[take_action[0]](take_action[1])
-                if result[0] is not False:
-                    playerMoved = True
-                take_action = []
-                continue
 
         # Computer turn
        
@@ -149,7 +164,7 @@ while running:
 
             #Override Q-Choice with Heuristics if heuristic zombies is true
             HeuristicZombies = True
-            if HeuristicZombies:
+            if HeuristicZombies and player_role == "Government":
                 optimum_state = GameBoard.heuristic_state()
                 if optimum_state != False:
                     move_coord = GameBoard.toCoord(optimum_state.location)
