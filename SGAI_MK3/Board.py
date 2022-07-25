@@ -1,9 +1,11 @@
+from Resources import Resources
 from State import State
 import random as rd
 from Person import Person
 from Wall import Wall
 from typing import List, Tuple
 from constants import *
+import random
 
 
 class Board:
@@ -16,6 +18,14 @@ class Board:
         self.columns = dimensions[1]
         self.player_role = player_role
         self.player_num = ROLE_TO_ROLE_NUM[player_role]
+        self.safeEdge = random.choice(
+            [
+                [0, 1, 2, 3, 4, 5],
+                [0, 6, 12, 18, 24, 30],
+                [5, 11, 17, 23, 29, 35],
+                [30, 31, 32, 33, 34, 35],
+            ]
+        )
         self.population = 0
         self.States = []
         self.QTable = []
@@ -32,14 +42,23 @@ class Board:
             "bite": self.bite,
             "wall": self.wall
         }
+        self.resources = Resources(4)
+
+    def getSafeEdge(self):
+        return self.safeEdge
+
+    def count_people(self, isZombie: bool) -> int:
+        ret = 0
+        for state in self.States:
+            if state.person is not None and state.person.isZombie == isZombie:
+                ret += 1
+        return ret
 
     def num_zombies(self) -> int:
-        r = 0
-        for state in self.States:
-            if state.person != None:
-                if state.person.isZombie:
-                    r += 1
-        return r
+        return self.count_people(True)
+
+    def num_people(self) -> int:
+        return self.count_people(False)
 
     def act(self, oldstate: Tuple[int, int], givenAction: str):
         cell = self.toCoord(oldstate)
@@ -107,8 +126,22 @@ class Board:
                 state = self.States[idx]
                 if state.person is not None:
                     changed_states = False
-                    if action == "heal" and (
-                        state.person.isZombie or not state.person.isVaccinated
+                    if (
+                        action == "heal"
+                        and (
+                            state.person.isZombie
+                            or (
+                                not state.person.isVaccinated
+                                and idx in self.getSafeEdge()
+                            )
+                        )
+                        and (
+                            (state.person.isZombie and B.resources.spendOn("cure"))
+                            or (
+                                not state.person.isVaccinated
+                                and B.resources.spendOn("vaccinate")
+                            )
+                        )
                     ):
                         poss.append(B.toCoord(idx))
                         changed_states = True
@@ -128,8 +161,11 @@ class Board:
                             else B.States[i]
                             for i in range(len(self.States))
                         ]
+                        B.resources = self.resources.clone()
+                        
                 elif action == "wall" and state.wall is None:
                      poss.append(B.toCoord(idx))
+                   
         return poss
 
     def toCoord(self, i: int):
@@ -153,6 +189,7 @@ class Board:
         )
         NB.States = [state.clone() for state in L]
         NB.player_role = role
+        NB.resources = self.resources.clone()
         return NB
 
     def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
@@ -289,7 +326,7 @@ class Board:
         If there is a zombie there, the person will be cured.
         If there is a person there, the person will be vaccinated
         If no person is selected, then return [False, None]
-        if a person is vaccined, then return [True, index]
+        if a person is vaccinated, then return [True, index]
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
@@ -297,9 +334,26 @@ class Board:
         p = self.States[i].person
 
         if p.isZombie:
-            p.get_cured()
+            if self.isAdjacentTo(coords, False): # zombie only cured if adjacent
+                if self.resources.spendOn("cure"):
+                    chance = 0.8 # 80% chance of getting cured (for now, # can be changed)
+                    if rd.random() < chance:
+                        p.get_cured()
+                    else: 
+                        print("Cure Failed")
+                        return [False, None]
+                else:
+                    return [False, None]
+            else:
+                return [False, None]
         else:
-            p.get_vaccinated()
+            if i in self.getSafeEdge():
+                if self.resources.spendOn("vaccinate"):
+                    p.get_vaccinated()
+                else:
+                    return [False, i]
+            else:
+                return [False, i]
         return [True, i]
 
     def wall(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
@@ -374,3 +428,8 @@ class Board:
         """
         for state in self.States:
             state.update()
+
+        self.resources.update(self.num_people())
+
+    def personAtIdx(self, idx: int):
+        return self.States[idx].person
