@@ -165,7 +165,7 @@ def display_resources(resources):
     )
     screen.blit(
         font.render(
-            f"cures cost {resources.costs['cure']}, vax costs {resources.costs['vaccinate']}",
+            f"cures cost {resources.costs['cure']}, vax costs {resources.costs['vaccinate']}, and walls cost {resources.costs['wall']}",
             True,
             WHITE,
         ),
@@ -224,13 +224,10 @@ def display_grid(GameBoard: Board):
             board_like[idx].draw(
                 screen, bgcolor, image_path=image_path, image_size=PERSON_SIZE
             )
-            display_image(screen, char, (35, 60), coords)
-        elif GameBoard.States[x].wall is not None:
-            coords = (
-                int(x % GameBoard.rows) * CELL_DIMENSIONS[0] + MARGIN,
-                int(x / GameBoard.columns) * CELL_DIMENSIONS[1] + MARGIN
+        elif GameBoard.States[idx].wall is not None:
+            board_like[idx].draw(
+                screen, bgcolor, image_path="Assets/wall.jpg", image_size=CELL_DIMENSIONS
             )
-            display_wall(coords)
         else:
             # no person, so just draw the cell with the background color
             board_like[idx].draw(screen, bgcolor)

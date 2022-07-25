@@ -360,9 +360,11 @@ class Board:
         i = self.toIndex(coords)
         if self.States[i].person is not None or not self.isValidCoordinate(coords):
             return [False, None]
-        w = Wall()
-        self.States[i].wall = w
-        return [True, i]
+        if self.resources.spendOn("wall"):
+            w = Wall()
+            self.States[i].wall = w
+            return [True, i]
+        return [False, None]
 
     def get_possible_states(self, role_number: int):
         indexes = []
