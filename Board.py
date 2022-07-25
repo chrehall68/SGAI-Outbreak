@@ -462,6 +462,6 @@ class Board:
     def getPlayerStates (self):
         arr = []
         for i in self.States:
-            if i.person is not None:
+            if i.person is not None and i.person.isZombie == False:
                 arr.append(i)
         return arr

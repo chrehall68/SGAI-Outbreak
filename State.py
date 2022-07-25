@@ -159,3 +159,35 @@ class State:
         if self.person is None:
             return
         self.person.update()
+
+    def get_possible_player_actions (self, GameBoard): # returns number value
+        actions = [
+    "moveRight", "moveLeft", "moveUp", "moveDown", "healRight", "healLeft",
+    "healUp", "healDown", "killRight", "killLeft", "killUp", "killDown"
+]
+        act = []
+        x, y = GameBoard.toCoord(self.location)
+        adjStates = self.get_adj_states(GameBoard)
+        if x<5 and GameBoard.States[GameBoard.toIndex(x+1, y)].person is None:
+            act.append(0) # 0 = move right
+        if x>0 and GameBoard.States[GameBoard.toIndex(x-1, y)].person is None:
+            act.append(1) # 1 = move left
+        if y<5 and GameBoard.States[GameBoard.toIndex(x, y+1)].person is None:
+            act.append(3)
+        if y>0 and GameBoard.States[GameBoard.toIndex(x, y-1)].person is None:
+            act.append(2)
+        if GameBoard.States[GameBoard.toIndex(x+1, y)].person is not None and GameBoard.States[GameBoard.toIndex(x+1, y)].person.isZombie==True: # right
+            act.append(4) # right
+            act.append(8)
+        if GameBoard.States[GameBoard.toIndex(x-1, y)].person is not None and GameBoard.States[GameBoard.toIndex(x+1, y)].person.isZombie==True: # right
+            act.append(5) # left
+            act.append(9)
+        if GameBoard.States[GameBoard.toIndex(x, y+1)].person is not None and GameBoard.States[GameBoard.toIndex(x+1, y)].person.isZombie==True: # right
+            act.append(7) # bottom
+            act.append(11)
+        if GameBoard.States[GameBoard.toIndex(x, y-1)].person is not None and GameBoard.States[GameBoard.toIndex(x+1, y)].person.isZombie==True: # right
+            act.append(6) # top
+            act.append(10)
+        return act
+        
+        
