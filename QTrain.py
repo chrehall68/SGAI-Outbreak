@@ -66,7 +66,7 @@ class QTrain:
             actions[action] = "heal"
         if actions[action] == "killRight" or actions[action] == "killLeft" or actions[action] == "killUp" or actions[action] == "killDown":
             actions[action] = "kill"
-        print("moveChosen")
+        print("moveChosen is " + str(actions[action]))
         success, new_state_index = self.GameBoard.actionToFunction[
             actions[action]](coords)
 
