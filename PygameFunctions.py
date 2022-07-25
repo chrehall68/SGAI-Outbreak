@@ -1,6 +1,5 @@
 from typing import List, Tuple
 import pygame
-from sqlalchemy import false
 from constants import *
 from Board import Board
 import constants
