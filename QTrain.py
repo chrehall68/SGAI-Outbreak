@@ -97,6 +97,10 @@ class QTrain:
                     coords = [coords[0], coords[1] + 1]
                 elif actions[action] == "healDown" or actions[action] == "killDown":
                     coords = [coords[0], coords[1] - 1]
+                if actions[action] == "healRight" or actions[action] == "healLeft" or actions[action] == "healUp" or actions[action] == "healDown":
+                    actions[action] = "heal"
+                if actions[action] == "killRight" or actions[action] == "killLeft" or actions[action] == "killUp" or actions[action] == "killDown":
+                    actions[action] = "kill"
                 success, new_state_index = self.GameBoard.actionToFunction[
                     actions[action]](coords)
                 new_state = self.GameBoard.States[new_state_index]
