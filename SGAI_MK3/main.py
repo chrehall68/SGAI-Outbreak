@@ -18,7 +18,7 @@ epochs = 1000
 epochs_ran = 0
 Original_Board = GameBoard.clone(GameBoard.States, GameBoard.player_role)
 
-#Temp
+# Temp
 print(GameBoard.getSafeEdge())
 
 
@@ -27,9 +27,11 @@ running = True
 take_action = []
 playerMoved = False
 
+if SELF_PLAY:
+    PF.initScreen(GameBoard)
+
 while running:
     P = PF.run(GameBoard)
-    print(f"The government has {GameBoard.resources.resources} resources")
 
     if SELF_PLAY:
         if not playerMoved:

@@ -12,7 +12,8 @@ BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
-LINE_WIDTH = 5
+VAX_COLOR = (102, 255, 0)
+CELL_BORDER = 2
 IMAGE_ASSETS = [
     "person_normal.png",
     "person_vax.png",
@@ -26,3 +27,4 @@ CURE_BITE_DIMS = (200, 200)
 CELL_DIMENSIONS = (100, 100)  # number of pixels (x, y) for each cell
 CUR_MOVE_COORDS = (800, 400)
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
+PERSON_SIZE = (35, 60)
