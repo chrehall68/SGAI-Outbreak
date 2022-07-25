@@ -2,6 +2,7 @@ from Resources import Resources
 from State import State
 import random as rd
 from Person import Person
+from Wall import Wall
 from typing import List, Tuple
 from constants import *
 import random
@@ -39,6 +40,7 @@ class Board:
             "moveRight": self.moveRight,
             "heal": self.heal,
             "bite": self.bite,
+            "wall": self.wall
         }
         self.resources = Resources(4)
 
@@ -76,7 +78,7 @@ class Board:
         """
         Get the coordinates of people (or zombies) that are able
         to make the specified move.
-        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', and 'heal')
+        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', 'heal', and 'wall')
         @param role - either 'Zombie' or 'Government'; helps decide whether an action
         is valid and which people/zombies it applies to
         """
@@ -144,7 +146,7 @@ class Board:
                         poss.append(B.toCoord(idx))
                         changed_states = True
                     elif (
-                        action != "heal"
+                        action != "heal" and action != "wall"
                         and not state.person.isZombie
                         and B.actionToFunction[action](B.toCoord(idx))[0]
                     ):
@@ -160,6 +162,10 @@ class Board:
                             for i in range(len(self.States))
                         ]
                         B.resources = self.resources.clone()
+                        
+                elif action == "wall" and state.wall is None:
+                     poss.append(B.toCoord(idx))
+                   
         return poss
 
     def toCoord(self, i: int):
@@ -223,7 +229,7 @@ class Board:
             return [False, destination_idx]
 
         # Check if the destination is currently occupied
-        if self.States[destination_idx].person is None:
+        if self.States[destination_idx].person is None and self.States[destination_idx].wall is None:
             self.States[destination_idx].person = self.States[start_idx].person
             self.States[start_idx].person = None
             return [True, destination_idx]
@@ -264,11 +270,13 @@ class Board:
             return self.QGreedyat(state_id)
         else:
             if self.player_num == 1:  # Player is Govt
-                d = rd.randint(0, 4)
+                d = rd.randint(0, 5)
+                if d == 5:
+                    d = 6
             else:
                 d = rd.randint(0, 5)
-                while d != 4:
-                    d = rd.randint(0, 4)
+                while d == 4:
+                    d = rd.randint(0, 5)
             return d
 
     def choose_state(self, lr: float):
@@ -346,6 +354,14 @@ class Board:
                     return [False, i]
             else:
                 return [False, i]
+        return [True, i]
+
+    def wall(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        i = self.toIndex(coords)
+        if self.States[i].person is not None or not self.isValidCoordinate(coords):
+            return [False, None]
+        w = Wall()
+        self.States[i].wall = w
         return [True, i]
 
     def get_possible_states(self, role_number: int):

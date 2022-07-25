@@ -92,6 +92,12 @@ while running:
                         playerMoved = True
                     take_action = []
 
+            elif take_action[0] == "heal" or take_action[0] == "bite" or take_action[0] == "wall":
+                result = GameBoard.actionToFunction[take_action[0]](take_action[1])
+                if result[0] is not False:
+                    playerMoved = True
+                take_action = []
+
         # Computer turn
         else:
             playerMoved = False
@@ -100,8 +106,8 @@ while running:
             # Make a list of all possible actions that the computer can take
             possible_actions = [
                 ACTION_SPACE[i]
-                for i in range(6)
-                if (i != 4 and player_role == "Government")
+                for i in range(7)
+                if (i != 4 and i != 6 and player_role == "Government")
                 or (i != 5 and player_role == "Zombie")
             ]
             possible_move_coords = []
@@ -132,7 +138,6 @@ while running:
 
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
-
             # update the board's states
             GameBoard.update()
 
