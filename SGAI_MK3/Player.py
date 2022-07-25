@@ -63,3 +63,27 @@ class ZombiePlayer(Player):
 
     def __init__(self) -> None:
         super().__init__("Zombie")
+
+
+class GovernmentAIPlayer(GovernmentPlayer):
+    """
+    Will be a smarter vwersion of the Human Player
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def get_move(self, board: Board) -> Tuple[str, Tuple[int, int]]:
+        raise NotImplementedError("TODO")
+
+
+class ZombieAIPlayer(ZombiePlayer):
+    """
+    Will be a smarter version of the Zombie Player
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def get_move(self, board: Board) -> Tuple[str, Tuple[int, int]]:
+        raise NotImplementedError("TODO")
