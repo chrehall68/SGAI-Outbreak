@@ -9,13 +9,16 @@ steps_per_game = 100
 learning_rate = 0.8  # Learning rate
 discount_rate = 0.95  # Discounting rate
 state_size = 36
-action_size = 6
+action_size = 12
 
 max_exploration_rate = 1
 min_exploration_rate = .01
 exploration_decay_rate = .001
 
-actions = ["moveRight", "moveLeft", "moveUp", "moveDown", "heal", "kill"]
+actions = [
+    "moveRight", "moveLeft", "moveUp", "moveDown", "healRight", "healLeft",
+    "healUp", "healDown", "killRight", "killLeft", "killUp", "killDown"
+]
 
 
 class QTrain:
@@ -49,6 +52,14 @@ class QTrain:
         action = max_q_action
         state = max_q_state
         coords = self.GameBoard.toCoord(state.location)
+        if actions[action] == "healRight" or actions[action] == "killRight":
+            coords = [coords[0] + 1, coords[1]]
+        elif actions[action] == "healLeft" or actions[action] == "killLeft":
+            coords = [coords[0] - 1, coords[1]]
+        elif actions[action] == "healUp" or actions[action] == "killUp":
+            coords = [coords[0], coords[1] + 1]
+        elif actions[action] == "healDown" or actions[action] == "killDown":
+            coords = [coords[0], coords[1] - 1]
         success, new_state_index = self.GameBoard.actionToFunction[
             actions[action]](coords)
 
@@ -57,7 +68,7 @@ class QTrain:
 
             for step in range(steps_per_game):
                 player_states = []  # contains all the states with people on it
-                action = rd.randint(0, 5)
+                action = rd.randint(0, 11)
                 state = rd.choice(player_states)
                 if rd.random() > self.exploration_rate:
                     max_q_state = player_states[0]
@@ -70,6 +81,14 @@ class QTrain:
                     action = max_q_action
                     state = max_q_state
                 coords = self.GameBoard.toCoord(state.location)
+                if actions[action] == "healRight" or actions[action] == "killRight":
+                    coords = [coords[0] + 1, coords[1]]
+                elif actions[action] == "healLeft" or actions[action] == "killLeft":
+                    coords = [coords[0] - 1, coords[1]]
+                elif actions[action] == "healUp" or actions[action] == "killUp":
+                    coords = [coords[0], coords[1] + 1]
+                elif actions[action] == "healDown" or actions[action] == "killDown":
+                    coords = [coords[0], coords[1] - 1]
                 success, new_state_index = self.GameBoard.actionToFunction[
                     actions[action]](coords)
                 new_state = self.GameBoard.States[new_state_index]
