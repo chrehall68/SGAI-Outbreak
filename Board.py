@@ -286,11 +286,10 @@ class Board:
 
     def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         """
-        Cures or vaccinates the person at the stated coordinates.
+        Cures the person at the stated coordinates.
         If there is a zombie there, the person will be cured.
-        If there is a person there, the person will be vaccinated
         If no person is selected, then return [False, None]
-        if a person is vaccined, then return [True, index]
+        if a person is cured, then return [True, index]
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
@@ -301,7 +300,7 @@ class Board:
         for state in self.States[i].get_adj_states(self):
             if state != None and state.person != None and not state.person.isZombie:
                 personAdjacent = True
-        if p.isZombie and personAdjacent and rd.random() > 0.25:
+        if p.isZombie and personAdjacent:
             p.get_cured()
         else:
             return [False, None]
@@ -334,24 +333,27 @@ class Board:
 
         return [True, i]
     def heuristic_action(self, optimum_state):
-        nearest_person_info = optimum_state.get_nearest_person(self)
-        if nearest_person_info[1] == 1:
-                return "bite"
-        
-        person_is_isolated = True
         poss_moves = optimum_state.get_possible_moves(self)
-        if nearest_person_info[0] == None:
-            return rd.choice(poss_moves)
+        if rd.random()<.75:
+            nearest_person_info = optimum_state.get_nearest_person(self)
+            if nearest_person_info[1] == 1:
+                    return "bite"
+            
+            person_is_isolated = True
+            if nearest_person_info[0] == None:
+                return rd.choice(poss_moves)
 
-        for state in nearest_person_info[0].get_adj_states(self):
-            if state.person != None and state.person.isZombie == False:
-                person_is_isolated = False
-        from_opt_to_person = optimum_state.get_direction_to(nearest_person_info[0], self)
-        if person_is_isolated and from_opt_to_person in poss_moves:
-            return from_opt_to_person
+            for state in nearest_person_info[0].get_adj_states(self):
+                if state.person != None and state.person.isZombie == False:
+                    person_is_isolated = False
+            from_opt_to_person = optimum_state.get_direction_to(nearest_person_info[0], self)
+            if person_is_isolated and from_opt_to_person in poss_moves:
+                return from_opt_to_person
+            else:
+                if from_opt_to_person in poss_moves and len(poss_moves) > 1:
+                    poss_moves.remove(from_opt_to_person)
+                return rd.choice(poss_moves)
         else:
-            if from_opt_to_person in poss_moves and len(poss_moves) > 1:
-                poss_moves.remove(from_opt_to_person)
             return rd.choice(poss_moves)
             
 
@@ -368,11 +370,14 @@ class Board:
         for state in zombie_states:
             if len(state.get_possible_moves(self)) <= 0:
                 zombie_states.remove(state)
-        for state in zombie_states:
-            nearest_person = state.get_nearest_person(self)
-            if nearest_person[1] < dist:
-                dist = nearest_person[1]
-                optimum_zombie_state = state
+        if rd.random() > 0.75:
+            for state in zombie_states:
+                nearest_person = state.get_nearest_person(self)
+                if nearest_person[1] < dist:
+                    dist = nearest_person[1]
+                    optimum_zombie_state = state
+        else:
+            optimum_zombie_state = rd.choice(zombie_states)
         return optimum_zombie_state
 
 
@@ -425,7 +430,8 @@ class Board:
             else:
                 self.States[x].person = None
         used = []
-        for x in range(4):
+        amt_zombies = rd.randint(1, 4)
+        for x in range(amt_zombies):
             s = rd.randint(0, len(poss) - 1)
             while s in used:
                 s = rd.randint(0, len(poss) - 1)
