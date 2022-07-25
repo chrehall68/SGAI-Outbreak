@@ -286,11 +286,10 @@ class Board:
 
     def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         """
-        Cures or vaccinates the person at the stated coordinates.
+        Cures the person at the stated coordinates.
         If there is a zombie there, the person will be cured.
-        If there is a person there, the person will be vaccinated
         If no person is selected, then return [False, None]
-        if a person is vaccined, then return [True, index]
+        if a person is cured, then return [True, index]
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
@@ -301,7 +300,7 @@ class Board:
         for state in self.States[i].get_adj_states(self):
             if state != None and state.person != None and not state.person.isZombie:
                 personAdjacent = True
-        if p.isZombie and personAdjacent and rd.random() > 0.25:
+        if p.isZombie and personAdjacent:
             p.get_cured()
         else:
             return [False, None]
@@ -371,11 +370,14 @@ class Board:
         for state in zombie_states:
             if len(state.get_possible_moves(self)) <= 0:
                 zombie_states.remove(state)
-        for state in zombie_states:
-            nearest_person = state.get_nearest_person(self)
-            if nearest_person[1] < dist:
-                dist = nearest_person[1]
-                optimum_zombie_state = state
+        if rd.random() > 0.75:
+            for state in zombie_states:
+                nearest_person = state.get_nearest_person(self)
+                if nearest_person[1] < dist:
+                    dist = nearest_person[1]
+                    optimum_zombie_state = state
+        else:
+            optimum_zombie_state = rd.choice(zombie_states)
         return optimum_zombie_state
 
 
