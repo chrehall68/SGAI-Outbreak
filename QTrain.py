@@ -25,6 +25,7 @@ class QTrain:
     def __init__(self, GameBoard):
 
         self.qtable = np.zeros(shape=(state_size, action_size))
+        self.readCSVFile()
         self.exploration_rate = 1
         self.GameBoard = GameBoard
 
@@ -37,7 +38,7 @@ class QTrain:
 
     def readCSVFile(self):
         with open("QTable.csv", 'r') as f:
-            tab = np.loadtxt(f, delimeter=',')
+            tab = np.loadtxt(f, delimiter=',')
             self.qtable = tab
 
     def chooseMove(self, possible_states):
@@ -47,8 +48,8 @@ class QTrain:
         max_q_state = player_states[0]
         max_q_action = 0
         for curr_state in player_states:  # 0 to 35
-            for q in range(len(curr_state.get_possible_player_actions(self.GameBoard))):  # 0 to 5
-                if curr_state.get_possible_player_actions(self.GameBoard)[q] > max_q_action:
+            for q in curr_state.get_possible_player_actions(self.GameBoard):  # 0 to 5
+                if self.qtable[curr_state.location][q] > max_q_action:
                     max_q_state = curr_state
                     max_q_action = q
         action = max_q_action
@@ -96,6 +97,10 @@ class QTrain:
                     coords = [coords[0], coords[1] + 1]
                 elif actions[action] == "healDown" or actions[action] == "killDown":
                     coords = [coords[0], coords[1] - 1]
+                if actions[action] == "healRight" or actions[action] == "healLeft" or actions[action] == "healUp" or actions[action] == "healDown":
+                    actions[action] = "heal"
+                if actions[action] == "killRight" or actions[action] == "killLeft" or actions[action] == "killUp" or actions[action] == "killDown":
+                    actions[action] = "kill"
                 success, new_state_index = self.GameBoard.actionToFunction[
                     actions[action]](coords)
                 new_state = self.GameBoard.States[new_state_index]
