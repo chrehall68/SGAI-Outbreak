@@ -6,7 +6,7 @@ from constants import *
 import time
 
 SELF_PLAY = True  # whether or not a human will be playing
-player_role = "Zombie"  # Valid options are "Government" and "Zombie"
+player_role = "Government"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
 GameBoard.populate()
@@ -164,7 +164,7 @@ while running:
 
             #Override Q-Choice with Heuristics if heuristic zombies is true
             HeuristicZombies = True
-            if HeuristicZombies and player_role == "Government":
+            if player_role == "Government":
                 optimum_state = GameBoard.heuristic_state()
                 if optimum_state != False:
                     move_coord = GameBoard.toCoord(optimum_state.location)
@@ -178,6 +178,8 @@ while running:
                     else:
                         # Implement the selected action
                         GameBoard.actionToFunction[action](move_coord)
+            else:
+                pass
             
 
             # update the board's states
