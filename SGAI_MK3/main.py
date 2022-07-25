@@ -1,5 +1,6 @@
 import pygame
 from Board import Board
+from Player import GovernmentPlayer, ZombiePlayer
 import PygameFunctions as PF
 import random as rd
 from constants import *
@@ -26,6 +27,12 @@ print(GameBoard.getSafeEdge())
 running = True
 take_action = []
 playerMoved = False
+
+enemy_player = None
+if player_role == "Government":
+    enemy_player = GovernmentPlayer()
+else:
+    enemy_player = ZombiePlayer()
 
 if SELF_PLAY:
     PF.initScreen(GameBoard)
@@ -97,38 +104,7 @@ while running:
             playerMoved = False
             take_action = []
 
-            # Make a list of all possible actions that the computer can take
-            possible_actions = [
-                ACTION_SPACE[i]
-                for i in range(6)
-                if (i != 4 and player_role == "Government")
-                or (i != 5 and player_role == "Zombie")
-            ]
-            possible_move_coords = []
-            while len(possible_move_coords) == 0 and len(possible_actions) != 0:
-                print("possible actions are", possible_actions)
-                action = possible_actions.pop(rd.randint(0, len(possible_actions) - 1))
-                possible_move_coords = GameBoard.get_possible_moves(
-                    action, "Government" if player_role == "Zombie" else "Zombie"
-                )
-
-            # no valid moves, player wins
-            if len(possible_actions) == 0 and len(possible_move_coords) == 0:
-                print("no possible moves for the computer")
-                if player_role == "Zombie":
-                    print(
-                        f"The government ended with {GameBoard.resources.resources} resources"
-                    )
-                    print(
-                        f"The price of vaccination was {GameBoard.resources.costs['vaccinate']} and the price of curing was {GameBoard.resources.costs['cure']}"
-                    )
-                PF.display_win_screen()
-                running = False
-                continue
-
-            # Select the destination coordinates
-            move_coord = rd.choice(possible_move_coords)
-            print(f"choosing to go with {action} at {move_coord}")
+            action, move_coord = enemy_player.get_move(GameBoard)
 
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)

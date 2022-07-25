@@ -26,11 +26,7 @@ class Board:
             ]
         )
         self.population = 0
-        self.States = []
-        self.QTable = []
-        for s in range(dimensions[0] * dimensions[1]):
-            self.States.append(State(None, s))
-            self.QTable.append([0] * 6)
+        self.States = [State(None, s) for s in range(dimensions[0] * dimensions[1])]
 
         self.actionToFunction = {
             "moveUp": self.moveUp,
@@ -57,14 +53,6 @@ class Board:
 
     def num_people(self) -> int:
         return self.count_people(False)
-
-    def act(self, oldstate: Tuple[int, int], givenAction: str):
-        cell = self.toCoord(oldstate)
-        f = self.actionToFunction[givenAction](cell)
-        reward = self.States[oldstate].evaluate(givenAction, self)
-        if f[0] == False:
-            reward = 0
-        return [reward, f[1]]
 
     def containsPerson(self, isZombie: bool):
         for state in self.States:
@@ -245,62 +233,6 @@ class Board:
         new_coords = (coords[0] + 1, coords[1])
         return self.move(coords, new_coords)
 
-    def QGreedyat(self, state_id: int):
-        biggest = self.QTable[state_id][0] * self.player_num
-        ind = 0
-        A = self.QTable[state_id]
-        i = 0
-        for qval in A:
-            if (qval * self.player_num) > biggest:
-                biggest = qval
-                ind = i
-            i += 1
-        return [ind, self.QTable[ind]]  # action_index, qvalue
-
-    def choose_action(self, state_id: int, lr: float):
-        L = lr * 100
-        r = rd.randint(0, 100)
-        if r < L:
-            return self.QGreedyat(state_id)
-        else:
-            if self.player_num == 1:  # Player is Govt
-                d = rd.randint(0, 4)
-            else:
-                d = rd.randint(0, 5)
-                while d != 4:
-                    d = rd.randint(0, 4)
-            return d
-
-    def choose_state(self, lr: float):
-        L = lr * 100
-        r = rd.randint(0, 100)
-        if r < L:
-            biggest = None
-            sid = None
-            for x in range(len(self.States)):
-                if self.States[x].person != None:
-                    q = self.QGreedyat(x)
-                    if biggest is None:
-                        biggest = q[1]
-                        sid = x
-                    elif q[1] > biggest:
-                        biggest = q[1]
-                        sid = x
-            return self.QGreedyat(sid)
-        else:
-            if self.player_num == -1:  # Player is Govt
-                d = rd.randint(0, len(self.States))
-                while self.States[d].person is None or self.States[d].person.isZombie:
-                    d = rd.randint(0, len(self.States))
-            else:
-                d = rd.randint(0, len(self.States))
-                while (
-                    self.States[d].person is None
-                    or self.States[d].person.isZombie == False
-                ):
-                    d = rd.randint(0, len(self.States))
-            return d
-
     def bite(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         i = self.toIndex(coords)
         if (
@@ -326,12 +258,13 @@ class Board:
         p = self.States[i].person
 
         if p.isZombie:
-            if self.isAdjacentTo(coords, False): # zombie only cured if adjacent
+            if self.isAdjacentTo(coords, False):  # zombie only cured if adjacent
                 if self.resources.spendOn("cure"):
-                    chance = 0.8 # 80% chance of getting cured (for now, # can be changed)
+                    # 80% chance of getting cured (for now, # can be changed)
+                    chance = 0.8
                     if rd.random() < chance:
                         p.get_cured()
-                    else: 
+                    else:
                         print("Cure Failed")
                         return [False, None]
                 else:
@@ -347,42 +280,6 @@ class Board:
             else:
                 return [False, i]
         return [True, i]
-
-    def get_possible_states(self, role_number: int):
-        indexes = []
-        i = 0
-        for state in self.States:
-            if state.person != None:
-                if role_number == 1 and state.person.isZombie == False:
-                    indexes.append(i)
-                elif role_number == -1 and state.person.isZombie:
-                    indexes.append(i)
-            i += 1
-        return indexes
-
-    def step(self, role_number: int, learningRate: float):
-        P = self.get_possible_states(role_number)
-        r = rd.uniform(0, 1)
-        if r < learningRate:
-            rs = rd.randrange(0, len(self.States) - 1)
-            if role_number == 1:
-                while (
-                    self.States[rs].person is not None
-                    and self.States[rs].person.isZombie
-                ):
-                    rs = rd.randrange(0, len(self.States) - 1)
-            else:
-                while (
-                    self.States[rs].person is not None
-                    and self.States[rs].person.isZombie == False
-                ):
-                    rs = rd.randrange(0, len(self.States) - 1)
-
-            # random state and value
-        # old_value = QTable[state][acti]
-        # next_max = np.max(QTable[next_state])
-        # new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
-        # QTable[state][acti] = new_value
 
     def populate(self):
         total = rd.randint(7, ((self.rows * self.columns) / 3))
