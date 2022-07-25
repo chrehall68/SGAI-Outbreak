@@ -6,6 +6,7 @@ from typing import List, Tuple
 from constants import *
 import random
 
+
 class Board:
     def __init__(
         self,
@@ -16,7 +17,14 @@ class Board:
         self.columns = dimensions[1]
         self.player_role = player_role
         self.player_num = ROLE_TO_ROLE_NUM[player_role]
-        self.safeEdge = random.choice([[0,1,2,3,4,5],[0,6,12,18,24,30],[5,11,17,23,29,35],[30,31,32,33,34,35]])
+        self.safeEdge = random.choice(
+            [
+                [0, 1, 2, 3, 4, 5],
+                [0, 6, 12, 18, 24, 30],
+                [5, 11, 17, 23, 29, 35],
+                [30, 31, 32, 33, 34, 35],
+            ]
+        )
         self.population = 0
         self.States = []
         self.QTable = []
@@ -33,7 +41,7 @@ class Board:
             "bite": self.bite,
         }
         self.resources = Resources(4)
-    
+
     def getSafeEdge(self):
         return self.safeEdge
 
@@ -118,7 +126,13 @@ class Board:
                     changed_states = False
                     if (
                         action == "heal"
-                        and (state.person.isZombie or (not state.person.isVaccinated  and idx in self.getSafeEdge()))
+                        and (
+                            state.person.isZombie
+                            or (
+                                not state.person.isVaccinated
+                                and idx in self.getSafeEdge()
+                            )
+                        )
                         and (
                             (state.person.isZombie and B.resources.spendOn("cure"))
                             or (
@@ -400,3 +414,6 @@ class Board:
             state.update()
 
         self.resources.update(self.num_people())
+
+    def personAtIdx(self, idx: int):
+        return self.States[idx].person
