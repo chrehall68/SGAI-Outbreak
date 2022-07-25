@@ -102,7 +102,10 @@ while running:
                 else:
                     # Implement the selected action
                     GameBoard.actionToFunction[action](move_coord)
+                
+            time.sleep(1)
             qtrainer.chooseMove(GameBoard.getPlayerStates())
+            GameBoard.updateMovesSinceTransformation()
         else:
             if len(take_action) > 1:
                 if take_action[0] == "move":
