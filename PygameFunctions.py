@@ -112,6 +112,7 @@ def run(GameBoard: Board):
 
     # draw the score board
     display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS)
+    display_text(f"Last Move: TEMP VAR", LAST_MOVE_COORDS)
     return pygame.event.get()
 
 
@@ -124,7 +125,6 @@ def display_reset_move_button():
     )
     pygame.draw.rect(screen, BLACK, rect)
     screen.blit(font.render("Reset move?", True, WHITE), RESET_MOVE_COORDS)
-
 
 def display_image(
     screen: pygame.Surface,

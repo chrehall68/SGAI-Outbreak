@@ -31,6 +31,7 @@ CUR_MOVE_COORDS = (800, 400)
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
 SCORE_DIMS = (200,100)
 SCORE_COORDS = (950, 650)
+LAST_MOVE_COORDS = (800, 725)
 CURRENT_SCORE = 0
 SCORE_VALUES = { # TEMPORARY VALUES
     "heal":100,
