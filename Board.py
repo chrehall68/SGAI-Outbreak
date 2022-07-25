@@ -452,3 +452,16 @@ class Board:
         for state in self.States:
             if state.person is not None:
                 state.person.updateMovesSinceTransformation()
+
+    def resetBoard (self):
+        self.population = 0
+        self.States = []
+        for s in range(6*6):
+            self.States.append(State(None, s))
+            
+    def getPlayerStates (self):
+        arr = []
+        for i in self.States:
+            if i.person is not None:
+                arr.append(i)
+        return arr
