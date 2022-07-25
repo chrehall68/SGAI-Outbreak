@@ -42,12 +42,14 @@ class QTrain:
 
     def chooseMove(self, possible_states):
         player_states = possible_states  # contains all the states with people on it
+        if(len(player_states) == 0):
+            return
         max_q_state = player_states[0]
         max_q_action = 0
         for curr_state in player_states:  # 0 to 35
-            for q in range(curr_state.get_possible_player_actions()):  # 0 to 5
-                if curr_state.get_possible_player_actions()[q] > max_q_state:
-                    max_q_state = curr_state.get_possible_player_actions()
+            for q in range(len(curr_state.get_possible_player_actions(self.GameBoard))):  # 0 to 5
+                if curr_state.get_possible_player_actions(self.GameBoard)[q] > max_q_action:
+                    max_q_state = curr_state
                     max_q_action = q
         action = max_q_action
         state = max_q_state
@@ -60,6 +62,11 @@ class QTrain:
             coords = [coords[0], coords[1] + 1]
         elif actions[action] == "healDown" or actions[action] == "killDown":
             coords = [coords[0], coords[1] - 1]
+        if actions[action] == "healRight" or actions[action] == "healLeft" or actions[action] == "healUp" or actions[action] == "healDown":
+            actions[action] = "heal"
+        if actions[action] == "killRight" or actions[action] == "killLeft" or actions[action] == "killUp" or actions[action] == "killDown":
+            actions[action] = "kill"
+        print("moveChosen")
         success, new_state_index = self.GameBoard.actionToFunction[
             actions[action]](coords)
 

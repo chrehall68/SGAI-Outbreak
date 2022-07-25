@@ -4,13 +4,13 @@ import PygameFunctions as PF
 import random as rd
 from constants import *
 import time
-#import QTrain as qt
+import QTrain as qt
 
 SELF_PLAY = True  # whether or not a human will be playing
-player_role = "Government"  # Valid options are "Government" and "Zombie"
+player_role = "Zombie"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
-qtrainer = qt(GameBoard)
+qtrainer = qt.QTrain(GameBoard)
 GameBoard.populate()
 
 # Self play variables
@@ -102,6 +102,7 @@ while running:
                 else:
                     # Implement the selected action
                     GameBoard.actionToFunction[action](move_coord)
+            qtrainer.chooseMove(GameBoard.getPlayerStates())
         else:
             if len(take_action) > 1:
                 if take_action[0] == "move":
@@ -193,10 +194,7 @@ while running:
                         # Implement the selected action
                         GameBoard.actionToFunction[action](move_coord)
             else:
-                #poss_states = []
-                
-                #qtrainer.chooseMove(GameBoard.getPlayerStates())
-                pass
+                qtrainer.chooseMove(GameBoard.getPlayerStates())
             
 
             # update the board's states
