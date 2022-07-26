@@ -71,6 +71,33 @@ class Board:
                 return idx
         return -1
 
+    def is_move_possible_at(self, idx):
+        """
+        Returns whether a move is possible at the given idx.
+        """
+        copy = self.clone(self.States, self.player_role)
+        if self.States[idx].person is None:
+            return False
+
+        # try moves
+        start_coords = self.toCoord(idx)
+        for action in self.actionToFunction:
+            if "move" in action and copy.actionToFunction[action](start_coords)[0]:
+                return True
+
+        adjacents = self.getAdjacentCoords(start_coords)
+        for coord in adjacents:
+            # try biting if zombie
+            if copy.States[idx].person.isZombie:
+                if copy.bite(coord)[0]:
+                    return True
+            # try healing if person
+            else:
+                if copy.heal(coord)[0]:
+                    return True
+
+        return False
+
     def get_possible_moves(self, action: str, role: str):
         """
         Get the coordinates of people (or zombies) that are able
@@ -185,14 +212,21 @@ class Board:
         NB.resources = self.resources.clone()
         return NB
 
-    def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
-        ret = False
+    def getAdjacentCoords(self, coord) -> List[Tuple[int, int]]:
         vals = [
             (coord[0], coord[1] + 1),
             (coord[0], coord[1] - 1),
             (coord[0] + 1, coord[1]),
             (coord[0] - 1, coord[1]),
         ]
+        for idx in range(len(vals) - 1, -1, -1):
+            if not self.isValidCoordinate(vals[idx]):
+                vals.pop(idx)
+        return vals
+
+    def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
+        ret = False
+        vals = self.getAdjacentCoords(coord)
         for coord in vals:
             if (
                 self.isValidCoordinate(coord)
@@ -342,6 +376,13 @@ class Board:
         return self.States[idx].person
 
     def get_board(self):
+        """
+        Returns an array from [0, 3]
+        3 means that the slot is empty but is a vax space
+        2 means that there is a zombie in the space
+        1 means that there is a person in the space
+        0 means that there is no one there
+        """
         s = []
         for i in range(len(self.States)):
             state = self.States[i]
