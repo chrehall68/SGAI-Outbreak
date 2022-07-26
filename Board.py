@@ -188,14 +188,14 @@ class Board:
 
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
-            return [False, destination_idx]
+            return [False, destination_idx, None]
 
         # Check if the destination is currently occupied
         if self.States[destination_idx].person is None:
             self.States[destination_idx].person = self.States[start_idx].person
             self.States[start_idx].person = None
-            return [True, destination_idx]
-        return [False, destination_idx]
+            return [True, destination_idx, None]
+        return [False, destination_idx, None]
 
     def moveUp(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         new_coords = (coords[0], coords[1] - 1)
@@ -297,7 +297,7 @@ class Board:
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
-            return [False, None]
+            return [False, None, None]
         p = self.States[i].person
 
         personAdjacent = False
