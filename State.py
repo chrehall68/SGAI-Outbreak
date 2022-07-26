@@ -1,6 +1,7 @@
 from typing import Tuple
 from Person import Person
 import math
+import numpy as np
 
 
 class State:
@@ -66,17 +67,15 @@ class State:
         rightCoords = GameBoard.toIndex((self_coords[0]+1, self_coords[1]))
         leftCoords = GameBoard.toIndex((self_coords[0]-1, self_coords[1]))
 
-        print("up down right left")
-        other_state.distance(GameBoard, upCoords), other_state.distance(GameBoard, downCoords),other_state.distance(GameBoard, rightCoords),other_state.distance(GameBoard, leftCoords)
-        
-        min_coords = min(other_state.distance(GameBoard, upCoords), other_state.distance(GameBoard, downCoords),other_state.distance(GameBoard, rightCoords),other_state.distance(GameBoard, leftCoords))
-        if min_coords == upCoords:
+
+        min_coords = np.argmin(np.array([other_state.distance(GameBoard, upCoords), other_state.distance(GameBoard, downCoords),other_state.distance(GameBoard, rightCoords),other_state.distance(GameBoard, leftCoords)]))
+        if min_coords == 0:
             dir="moveUp"
-        elif min_coords == downCoords:
+        elif min_coords == 1:
             dir="moveDown"
-        elif min_coords == rightCoords:
+        elif min_coords == 2:
             dir='moveRight'
-        elif min_coords == leftCoords:
+        elif min_coords == 3:
             dir="moveLeft"
         # if other_coords[0] == self_coords[0] + 1:
         #     dir = "moveRight"
@@ -90,7 +89,7 @@ class State:
 
     def get_possible_moves(self, GameBoard):
         adj_states = self.get_adj_states(GameBoard)
-        poss_acts = ["moveRight", "moveLeft", "moveUp", "moveDown"]
+        poss_acts = ["moveRight", "moveLeft", "moveUp", "moveDown", "bite"]
 
         for state in adj_states:
             if state.person != None:
@@ -105,6 +104,9 @@ class State:
                     poss_acts.remove("moveUp")
                 elif other_coords[1] == self_coords[1] + 1:
                     poss_acts.remove("moveDown")
+            else:
+                if "bite" in poss_acts:
+                    poss_acts.remove("bite")
         
         self_coords = GameBoard.toCoord(self.location)
         if self_coords[0] == 5 and "moveRight" in poss_acts:
