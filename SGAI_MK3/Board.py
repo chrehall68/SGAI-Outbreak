@@ -314,3 +314,18 @@ class Board:
 
     def personAtIdx(self, idx: int):
         return self.States[idx].person
+    
+    def get_board(self):
+        s = []
+        for i in range(len(self.States)):
+            if self.wall != None:
+                s.append(4)
+            elif self.States[i].person.isZombie:
+                s.append(2)
+            elif self.States[i].person.isZombie == False:
+                s.append(1)
+            else:
+                s.append(0)
+        for i in self.getSafeEdge():
+            s[i] = 3
+        return s
