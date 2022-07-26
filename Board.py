@@ -336,7 +336,7 @@ class Board:
         poss_moves = optimum_state.get_possible_moves(self)
         if len(poss_moves)==0:
             return "moveUp"
-        if rd.random()<.9:
+        if rd.random()<1:
             nearest_person_info = optimum_state.get_nearest_person(self)
             if nearest_person_info[1] == 1:
                     return "bite"
@@ -349,6 +349,7 @@ class Board:
                 if state.person != None and state.person.isZombie == False:
                     person_is_isolated = True
             from_opt_to_person = optimum_state.get_direction_to(nearest_person_info[0], self)
+
             if person_is_isolated and from_opt_to_person in poss_moves:
                 return from_opt_to_person
             else:
@@ -373,7 +374,7 @@ class Board:
         if len(zombie_states) == 0:
             return False
         optimum_zombie_state = zombie_states[0]
-        if rd.random() > 0.9:
+        if rd.random() > 1:
             for state in zombie_states:
                 nearest_person = state.get_nearest_person(self)
                 if nearest_person[1] < dist:

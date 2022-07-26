@@ -60,14 +60,31 @@ class State:
         other_coords = GameBoard.toCoord(other_state.location)
         
         dir = "On Same State"
-        if other_coords[0] == self_coords[0] + 1:
-            dir = "moveRight"
-        elif other_coords[0] == self_coords[0] - 1:
-            dir = "moveLeft"
-        elif other_coords[1] == self_coords[1] - 1:
-            dir = "moveUp"
-        elif other_coords[1] == self_coords[1] + 1:
-            dir = "moveDown"
+
+        upCoords = GameBoard.toIndex((self_coords[0], self_coords[1]-1))
+        downCoords = GameBoard.toIndex((self_coords[0], self_coords[1]+1))
+        rightCoords = GameBoard.toIndex((self_coords[0]+1, self_coords[1]))
+        leftCoords = GameBoard.toIndex((self_coords[0]-1, self_coords[1]))
+
+        print(other_state.distance(GameBoard, upCoords), other_state.distance(GameBoard, downCoords),other_state.distance(GameBoard, rightCoords),other_state.distance(GameBoard, leftCoords))
+
+        min_coords = min(other_state.distance(GameBoard, upCoords), other_state.distance(GameBoard, downCoords),other_state.distance(GameBoard, rightCoords),other_state.distance(GameBoard, leftCoords))
+        if min_coords == upCoords:
+            dir="moveUp"
+        elif min_coords == downCoords:
+            dir="moveDown"
+        elif min_coords == rightCoords:
+            dir='moveRight'
+        elif min_coords == leftCoords:
+            dir="moveLeft"
+        # if other_coords[0] == self_coords[0] + 1:
+        #     dir = "moveRight"
+        # elif other_coords[0] == self_coords[0] - 1:
+        #     dir = "moveLeft"
+        # elif other_coords[1] == self_coords[1] - 1:
+        #     dir = "moveUp"
+        # elif other_coords[1] == self_coords[1] + 1:
+        #     dir = "moveDown"
         return dir
 
     def get_possible_moves(self, GameBoard):
