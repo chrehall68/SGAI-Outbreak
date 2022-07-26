@@ -30,9 +30,10 @@ CELL_DIMENSIONS = (100, 100)  # number of pixels (x, y) for each cell
 CUR_MOVE_COORDS = (800, 400)
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
 SCORE_DIMS = (200,100)
-SCORE_COORDS = (950, 650)
+SCORE_COORDS = (950, 10)
 LAST_MOVE_COORDS = (10, 10)
-STEPS_COORDS = (800, 750)
+STEPS_COORDS = (10, 50)
+#STEPS_COORDS = (800, 750)
 CURRENT_SCORE = 0
 SCORE_VALUES = { # TEMPORARY VALUES
     "heal":100,
