@@ -69,6 +69,11 @@ class QTrain:
             action_str = "heal"
         if actions[action] == "killRight" or actions[action] == "killLeft" or actions[action] == "killUp" or actions[action] == "killDown":
             action_str = "kill"
+        #if rd.random() > 0.95:
+        #   state = rd.choice(possible_states)
+        #  action = rd.choice(state.get_possible_player_actions(self.GameBoard))
+        # action_str = actions[action]
+        #coords = self.GameBoard.toCoord(state.location)
 
         print(actions[action])
         success, new_state_index = self.GameBoard.actionToFunction[
@@ -185,7 +190,7 @@ class QTrain:
         if action in [8,9,10,11]:  # kill
             total_reward += 50
         if self.check_win(step):
-            total_reward += 750
+            total_reward += 750-step*2
         return total_reward
 
     def check_win(self, step):
