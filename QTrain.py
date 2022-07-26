@@ -194,7 +194,7 @@ class QTrain:
             total_reward += 50
         if self.check_win(step):
             total_reward += 1000-step*2
-        if actList[2] is not actList[3] and actList[2:3] is actList[0:1]:
+        if len(actList) is 4 and actList[2] is not actList[3] and actList[2:3] is actList[0:1]:
             total_reward -= 50
         return total_reward
 
