@@ -354,13 +354,15 @@ class Board:
                 if state.person != None and state.person.isZombie == False:
                     person_is_isolated = True
             from_opt_to_person = optimum_state.get_direction_to(nearest_person_info[0], self)
-            if person_is_isolated and from_opt_to_person in poss_moves:
-                return from_opt_to_person
-            else:
-                if from_opt_to_person in poss_moves and len(poss_moves) > 2:
-                    poss_moves.remove(from_opt_to_person)
+
+            return from_opt_to_person
+            # if person_is_isolated and from_opt_to_person in poss_moves:
+            #     return from_opt_to_person
+            # else:
+            #     if from_opt_to_person in poss_moves and len(poss_moves) > 2:
+            #         poss_moves.remove(from_opt_to_person)
               
-                return rd.choice(poss_moves)
+            #     return rd.choice(poss_moves)
         else:
             return rd.choice(poss_moves)
             
@@ -378,7 +380,7 @@ class Board:
         if len(zombie_states) == 0:
             return False
         optimum_zombie_state = zombie_states[0]
-        if rd.random() > 0.9:
+        if rd.random() < .9:
             for state in zombie_states:
                 nearest_person = state.get_nearest_person(self)
                 if nearest_person[1] < dist:
@@ -438,7 +440,7 @@ class Board:
             else:
                 self.States[x].person = None
         used = []
-        amt_zombies = rd.randint(2, 4)
+        amt_zombies = rd.randint(1, 4)
         for x in range(amt_zombies):
             s = rd.randint(0, len(poss) - 1)
             while s in used:
@@ -471,5 +473,12 @@ class Board:
         arr = []
         for i in self.States:
             if i.person is not None and i.person.isZombie == False:
+                arr.append(i)
+        return arr
+    
+    def getZombieStates(self):
+        arr = []
+        for i in self.States:
+            if i.person is not None and i.person.isZombie == True:
                 arr.append(i)
         return arr

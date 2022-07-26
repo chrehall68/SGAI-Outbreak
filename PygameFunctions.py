@@ -134,6 +134,7 @@ def run(GameBoard: Board):
     # draw the score board
     display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS, 32)
     display_text(f"Last Move:"+str(PREVIOUS_MOVE), LAST_MOVE_COORDS, 25)
+    display_text(f"Steps: {100-constants.number_steps}", LAST_MOVE_COORDS, 32)
     return pygame.event.get()
 
 def display_reset_move_button():
