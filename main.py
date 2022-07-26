@@ -78,6 +78,7 @@ while running:
                                 if (new_x==curr_x and curr_y==new_y+1) or (new_x==curr_x and curr_y==new_y-1) or (new_x==curr_x+1 and curr_y==new_y) or (new_x==curr_x-1 and curr_y==new_y):
                                     take_action.append(action)
                                 else:
+                                    PF.get_last_move('Government', None,None)
                                     take_action = []
                                     PF.reset_images()
                             else:
@@ -114,6 +115,7 @@ while running:
                         result = GameBoard.actionToFunction[directionToMove](take_action[1])
                         if result[0] is not False:
                             playerMoved = True
+                        PF.get_last_move('Government',take_action[0],None)
                         take_action = []
                         PF.reset_images()
                         GameBoard.updateMovesSinceTransformation()
@@ -123,8 +125,14 @@ while running:
                     if GameBoard.num_zombies() > 1 or not justStarted:
                         justStarted = False
                         result = GameBoard.actionToFunction[take_action[0]](take_action[1])
+                        print(result)
+                        print(take_action[0])
                         if result[0] is not False:
                             playerMoved = True
+                        if (result[2] is not None):
+                            PF.get_last_move('Government',take_action[0],result[2])
+                        else:
+                            PF.get_last_move('Government',None,None)
                         take_action = []
                         PF.reset_images()
                         GameBoard.updateMovesSinceTransformation()
@@ -192,10 +200,13 @@ while running:
                         prev_state = optimum_state
                         optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
                         move_coord = GameBoard.toCoord(optimum_state.location)
-                        GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+                        result = GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+                        PF.get_last_move('Zombie','bite',result[2])
+                        print(result)
                     else:
                         # Implement the selected action
                         GameBoard.actionToFunction[action](move_coord)
+                        PF.get_last_move('Zombie','move',None)
             else:
                 qtrainer.chooseMove(GameBoard.getPlayerStates())
             

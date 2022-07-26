@@ -5,7 +5,8 @@ from typing import List, Tuple
 from constants import *
 import constants
 
-
+success_of_cure = False
+success_of_bite = False
 class Board:
     def __init__(
         self,
@@ -268,23 +269,26 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
-    def bite(self, coords: Tuple[int, int], stage=3) -> Tuple[bool, int]:
+    def bite(self, coords: Tuple[int, int], stage=3) -> Tuple[bool, int, bool]:
         i = self.toIndex(coords)
+        global success_of_bite
         if (
             self.States[i].person is None
             or self.States[i].person.isZombie
             or not self.isAdjacentTo(coords, True)
         ):
-            return [False, None]
+            return [False, None, None]
         if stage==2:
             if rd.random()<constants.STAGE_2_BITE_RATE:
+                success_of_bite = True
                 self.States[i].person.get_bitten()
         elif stage==3:
             if rd.random()<constants.STAGE_3_BITE_RATE:
+                success_of_bite = True
                 self.States[i].person.get_bitten()
-        return [True, i]
+        return [True, i, success_of_bite]
 
-    def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+    def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int, bool]:
         """
         Cures the person at the stated coordinates.
         If there is a zombie there, the person will be cured.
@@ -301,21 +305,22 @@ class Board:
             if state != None and state.person != None and not state.person.isZombie:
                 personAdjacent = True
         if p.isZombie and personAdjacent:
-            p.get_cured()
+            global success_of_cure
+            success_of_cure = p.get_cured()
         else:
-            return [False, None]
+            return [False, None, None]
         
         constants.CURRENT_SCORE+=SCORE_VALUES["heal"]
 
-        return [True, i]
+        return [True, i, success_of_cure]
 
-    def kill(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+    def kill(self, coords: Tuple[int, int]) -> Tuple[bool, int, bool]:
         """
         KILLS ZOMBIE
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
-            return [False, None]
+            return [False, None, None]
         p = self.States[i].person
 
         personAdjacent = False
@@ -327,11 +332,11 @@ class Board:
             self.States[i].person = None
             p = None
         else:
-            return [False, None]
+            return [False, None, None]
         
         constants.CURRENT_SCORE+=SCORE_VALUES["kill"]
 
-        return [True, i]
+        return [True, i, True]
     def heuristic_action(self, optimum_state):
         poss_moves = optimum_state.get_possible_moves(self)
         if len(poss_moves)==0:

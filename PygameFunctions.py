@@ -14,6 +14,8 @@ screen.fill(BACKGROUND)
 HEART_SELECTED = False
 SKULL_SELECTED = False
 
+PREVIOUS_MOVE = ' '
+
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
     Get the action that the click represents.
@@ -84,9 +86,22 @@ def display_curr_action(act):
         HEART_SELECTED = False
         SKULL_SELECTED = False
 
-font = pygame.font.Font("freesansbold.ttf", 32)
-def display_text (text, coords):
-    score = font.render(text, True, (255,255,255))
+def get_last_move(player, move, success):
+    global PREVIOUS_MOVE
+    if (move == None and success == None):
+        PREVIOUS_MOVE = ' INVALID MOVE!'
+    elif (move == 'move'):
+        if (player == 'Government'):
+            PREVIOUS_MOVE = ' Just made a valid move!'
+        else:
+            PREVIOUS_MOVE = ' Zombie just made a move!'
+    else:
+        PREVIOUS_MOVE = ' The last move was ' + str(move) +' and it was a success: '+ str(success)
+
+
+def display_text (text, coords, font_size):
+    font_temp = pygame.font.Font("freesansbold.ttf", font_size)
+    score = font_temp.render(text, True, (255,255,255))
     screen.blit(score, coords)
 
 
@@ -117,8 +132,8 @@ def run(GameBoard: Board):
     display_reset_move_button()
 
     # draw the score board
-    display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS)
-    display_text(f"Last Move: TEMP VAR", LAST_MOVE_COORDS)
+    display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS, 32)
+    display_text(f"Last Move:"+str(PREVIOUS_MOVE), LAST_MOVE_COORDS, 25)
     return pygame.event.get()
 
 def display_reset_move_button():
@@ -257,7 +272,7 @@ def display_win_screen():
         font.render("You win!", True, WHITE),
         (500, 400),
     )
-    display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS)
+    display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS, 32)
     pygame.display.update()
 
     # catch quit event
