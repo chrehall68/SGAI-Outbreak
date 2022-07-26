@@ -60,7 +60,7 @@ class Board:
                 return True
         return False
 
-    def coordsOf(self, isZombie: bool):
+    def indexOf(self, isZombie: bool):
         """
         Returns the coordinates of the first occurrence of a
         person whose isZombie == isZombie. On failure, returns (-1, -1)
@@ -68,8 +68,8 @@ class Board:
         for idx in range(len(self.States)):
             state = self.States[idx]
             if state.person is not None and state.person.isZombie == isZombie:
-                return self.toCoord(idx)
-        return -1, -1
+                return idx
+        return -1
 
     def get_possible_moves(self, action: str, role: str):
         """
@@ -278,7 +278,7 @@ class Board:
                     if rd.random() < chance:
                         p.get_cured()
                     else:
-                        print("Cure Failed")
+                        # print("Cure Failed")
                         return [False, None]
                 else:
                     return [False, None]
