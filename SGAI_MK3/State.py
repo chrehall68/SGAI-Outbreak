@@ -67,7 +67,9 @@ class State:
         return moves
 
     def clone(self):
-        if self.person is None:
+        if self.wall is not None:
+            return State(self.wall, self.location)
+        elif self.person is None:
             return State(self.person, self.location)
         return State(self.person.clone(), self.location)
 

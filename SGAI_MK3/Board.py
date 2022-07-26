@@ -339,7 +339,7 @@ class Board:
                     chance = 0.8 # 80% chance of getting cured (for now, # can be changed)
                     if rd.random() < chance:
                         p.get_cured()
-                    else: 
+                    else:
                         print("Cure Failed")
                         return [False, None]
                 else:
