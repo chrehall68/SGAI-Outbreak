@@ -69,12 +69,18 @@ class QTrain:
             action_str = "heal"
         if actions[action] == "killRight" or actions[action] == "killLeft" or actions[action] == "killUp" or actions[action] == "killDown":
             action_str = "kill"
+        #if rd.random() > 0.95:
+        #   state = rd.choice(possible_states)
+        #  action = rd.choice(state.get_possible_player_actions(self.GameBoard))
+        # action_str = actions[action]
+        #coords = self.GameBoard.toCoord(state.location)
 
         print(actions[action])
         success, new_state_index = self.GameBoard.actionToFunction[
             action_str](coords)
 
     def train(self):
+        action_list = []
         for episode in range(episodes):
             self.GameBoard.resetBoard()
             self.GameBoard.populate()
@@ -122,7 +128,9 @@ class QTrain:
                 if coords[1]<0:
                     coords[1]=0
                 
-                
+                action_list.append(action_str)
+                if len(action_list) > 4:
+                    action_list.pop(0)
                 success, new_state_index = self.GameBoard.actionToFunction[
                     action_str](coords)
                 
@@ -134,7 +142,7 @@ class QTrain:
 
                 wasBitten = self.zombieMove()
 
-                reward = self.assign_reward(success, action, step, wasBitten)
+                reward = self.assign_reward(success, action, step, wasBitten, action_list)
 
                 self.qtable[state.location][action] = (1 - learning_rate) * self.qtable[
                     state.location][action] + learning_rate * (
@@ -172,7 +180,7 @@ class QTrain:
                 self.GameBoard.actionToFunction[action](move_coord)
                 return False  # no bite
 
-    def assign_reward(self, success, action, step, wasBitten):
+    def assign_reward(self, success, action, step, wasBitten, actList):
         total_reward = 0
         if wasBitten == True:
             total_reward -= 100
@@ -185,7 +193,9 @@ class QTrain:
         if action in [8,9,10,11]:  # kill
             total_reward += 50
         if self.check_win(step):
-            total_reward += 750
+            total_reward += 1000-step*2
+        if len(actList) is 4 and actList[2] is not actList[3] and actList[2:3] is actList[0:1]:
+            total_reward -= 50
         return total_reward
 
     def check_win(self, step):
