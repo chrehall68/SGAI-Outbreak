@@ -18,8 +18,8 @@ class Player:
         possible_actions = [
             ACTION_SPACE[i]
             for i in range(6)
-            if (i != 4 and self.player_name == "Government")
-            or (i != 5 and self.player_name == "Zombie")
+            if (i != 5 and self.player_name == "Government")
+            or (i != 4 and self.player_name == "Zombie")
         ]
         possible_move_coords = []
         while len(possible_move_coords) == 0 and len(possible_actions) != 0:
@@ -39,7 +39,7 @@ class Player:
                 print(
                     f"The price of vaccination was {board.resources.costs['vaccinate']} and the price of curing was {board.resources.costs['cure']}"
                 )
-            return False
+            return False, None
 
         # Select the destination coordinates
         move_coord = rd.choice(possible_move_coords)

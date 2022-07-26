@@ -30,9 +30,9 @@ playerMoved = False
 
 enemy_player = None
 if player_role == "Government":
-    enemy_player = GovernmentPlayer()
-else:
     enemy_player = ZombiePlayer()
+else:
+    enemy_player = GovernmentPlayer()
 
 if SELF_PLAY:
     PF.initScreen(GameBoard)
@@ -106,6 +106,10 @@ while running:
 
             action, move_coord = enemy_player.get_move(GameBoard)
 
+            if not action:
+                running = False
+                PF.display_win_screen()
+                continue
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
 

@@ -60,6 +60,17 @@ class Board:
                 return True
         return False
 
+    def coordsOf(self, isZombie: bool):
+        """
+        Returns the coordinates of the first occurrence of a
+        person whose isZombie == isZombie. On failure, returns (-1, -1)
+        """
+        for idx in range(len(self.States)):
+            state = self.States[idx]
+            if state.person is not None and state.person.isZombie == isZombie:
+                return self.toCoord(idx)
+        return -1, -1
+
     def get_possible_moves(self, action: str, role: str):
         """
         Get the coordinates of people (or zombies) that are able
@@ -234,6 +245,8 @@ class Board:
         return self.move(coords, new_coords)
 
     def bite(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        if not self.isValidCoordinate(coords):
+            return [False, None]
         i = self.toIndex(coords)
         if (
             self.States[i].person is None
@@ -281,8 +294,19 @@ class Board:
                 return [False, i]
         return [True, i]
 
-    def populate(self):
-        total = rd.randint(7, ((self.rows * self.columns) / 3))
+    def populate(self, num_people=-1, num_zombies=4):
+        """
+        Populate the board
+        @param num_people The number of people to make.
+        If set to -1 (default), makes a random number of people
+        between 7 and self.rows*self.columns/3. Note that the number of
+        people is the number of people BEFORE infection
+        @param num_zombies The number of zombies to make; defaults to 4
+        """
+        # make people
+        total = num_people
+        if total == -1:
+            total = rd.randint(7, ((self.rows * self.columns) / 3))
         poss = []
         for x in range(len(self.States)):
             r = rd.randint(0, 100)
@@ -293,8 +317,10 @@ class Board:
                 poss.append(x)
             else:
                 self.States[x].person = None
+
+        # make zombies
         used = []
-        for x in range(4):
+        for x in range(num_zombies):
             s = rd.randint(0, len(poss) - 1)
             while s in used:
                 s = rd.randint(0, len(poss) - 1)
@@ -314,3 +340,21 @@ class Board:
 
     def personAtIdx(self, idx: int):
         return self.States[idx].person
+
+    def get_board(self):
+        s = []
+        for i in range(len(self.States)):
+            state = self.States[i]
+            # if state.wall != None:
+            #    s.append(4)
+            if state.person is not None:
+                if state.person.isZombie:
+                    s.append(2)
+                else:
+                    s.append(1)
+            else:
+                s.append(0)
+        for i in self.getSafeEdge():
+            if s[i] == 0:
+                s[i] = 3
+        return s
