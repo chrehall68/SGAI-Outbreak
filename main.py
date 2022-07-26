@@ -1,8 +1,10 @@
+from numpy import number
 import pygame
 from Board import Board
 import PygameFunctions as PF
 import random as rd
 from constants import *
+import constants
 import time
 import QTrain as qt
 
@@ -28,7 +30,13 @@ take_action = []
 playerMoved = False
 justStarted = True
 
+
 while running:
+    if constants.number_steps>=100:
+        PF.display_win_screen()
+        running = False
+        continue
+            
     P = PF.run(GameBoard)
     if SELF_PLAY:
         if not GameBoard.containsPerson(False):
@@ -89,6 +97,20 @@ while running:
 
         # Action handling
         if player_role == "Zombie":
+            if len(GameBoard.getZombieStates()) == 0:
+                PF.display_win_screen()
+                running = False
+                continue
+            if constants.number_steps>=100:
+                PF.display_win_screen()
+                running = False
+                continue
+            constants.number_steps+=1
+
+            qtrainer.chooseMove(GameBoard.getPlayerStates())
+            GameBoard.updateMovesSinceTransformation()
+            time.sleep(.1)
+
             optimum_state = GameBoard.heuristic_state()
             if optimum_state != False:
                 move_coord = GameBoard.toCoord(optimum_state.location)
@@ -103,9 +125,6 @@ while running:
                     # Implement the selected action
                     GameBoard.actionToFunction[action](move_coord)
                 
-            time.sleep(.1)
-            qtrainer.chooseMove(GameBoard.getPlayerStates())
-            GameBoard.updateMovesSinceTransformation()
         else:
             if len(take_action) > 1:
                 if take_action[0] == "move":
@@ -144,6 +163,7 @@ while running:
         # Computer turn
        
         if playerMoved:
+            constants.number_steps+=1
             playerMoved = False
             take_action = []
             PF.reset_images()

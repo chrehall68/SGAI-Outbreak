@@ -32,6 +32,7 @@ MARGIN = 150  # Number of pixels to offset grid to the top-left side
 SCORE_DIMS = (200,100)
 SCORE_COORDS = (950, 650)
 LAST_MOVE_COORDS = (800, 725)
+STEPS_COORDS = (500, 725)
 CURRENT_SCORE = 0
 SCORE_VALUES = { # TEMPORARY VALUES
     "heal":100,
@@ -50,3 +51,5 @@ STAGE_3_BITE_RATE = 1
 
 HEART_SELECTED = False
 SKULL_SELECTED = False
+
+number_steps = 0

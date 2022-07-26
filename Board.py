@@ -470,3 +470,10 @@ class Board:
             if i.person is not None and i.person.isZombie == False:
                 arr.append(i)
         return arr
+    
+    def getZombieStates(self):
+        arr = []
+        for i in self.States:
+            if i.person is not None and i.person.isZombie == True:
+                arr.append(i)
+        return arr
