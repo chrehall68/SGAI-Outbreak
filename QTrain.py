@@ -142,7 +142,7 @@ class QTrain:
 
                 wasBitten = self.zombieMove()
 
-                reward = self.assign_reward(success, action, step, wasBitten, action_list)
+                reward = self.assign_reward(success, action, step, wasBitten, action_list, self.GameBoard.getPlayerStates())
 
                 self.qtable[state.location][action] = (1 - learning_rate) * self.qtable[
                     state.location][action] + learning_rate * (
@@ -180,10 +180,10 @@ class QTrain:
                 self.GameBoard.actionToFunction[action](move_coord)
                 return False  # no bite
 
-    def assign_reward(self, success, action, step, wasBitten, actList):
+    def assign_reward(self, success, action, step, wasBitten, actList, livingPeople):
         total_reward = 0
         if wasBitten == True:
-            total_reward -= 100
+            total_reward -= 500
         if success == False and action < 4:  # invalid move
             total_reward -= 1000
         if success == True and action < 4:  # successful move
@@ -193,7 +193,7 @@ class QTrain:
         if action in [8,9,10,11]:  # kill
             total_reward += 50
         if self.check_win(step):
-            total_reward += 1000-step*2
+            total_reward += 1000-step*2+len(livingPeople)*10
         if len(actList) is 4 and actList[2] is not actList[3] and actList[2:3] is actList[0:1]:
             total_reward -= 50
         return total_reward
