@@ -90,16 +90,23 @@ def display_curr_action(act):
 
 def get_last_move(player, move, success):
     global PREVIOUS_MOVE
+    global IS_TURN
     if (move == None and success == None):
         PREVIOUS_MOVE = ' INVALID MOVE!'
+        IS_TURN = True
     elif (move == 'move'):
         if (player == 'Government'):
             PREVIOUS_MOVE = ' Just made a valid move!'
+            IS_TURN = False
         else:
             PREVIOUS_MOVE = ' Zombie just made a move!'
+            IS_TURN = True
     else:
         PREVIOUS_MOVE = ' The last move was ' + str(move) +' and it was a success: '+ str(success)
-
+        if (player == 'Government'):
+            IS_TURN = False
+        else:
+            IS_TURN = True
 
 def display_text (text, coords, font_size):
     font_temp = pygame.font.Font("Assets/Magiblade.ttf", font_size)

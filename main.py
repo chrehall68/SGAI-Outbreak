@@ -31,7 +31,6 @@ running = True
 take_action = []
 playerMoved = False
 justStarted = True
-IS_PLAYER_TURN = 1
 
 while running:
     if constants.number_steps>=100:
@@ -40,7 +39,6 @@ while running:
         continue
             
     P = PF.run(GameBoard)
-    PF.display_turn(IS_PLAYER_TURN)
     if SELF_PLAY:
         if not GameBoard.containsPerson(False):
             PF.display_lose_screen()
@@ -187,9 +185,8 @@ while running:
             PF.reset_images()
             GameBoard.update() # UPDATE BOARD BEFORE ZOMBIE MOVE SO THE DELAY CAN HAPPEN
             
-            IS_PLAYER_TURN = -1* IS_PLAYER_TURN
-            PF.display_turn(IS_PLAYER_TURN)
-            print(IS_PLAYER_TURN)
+            
+            
             pygame.display.update()
             
             # PF.run(GameBoard) # do this to update display
@@ -250,9 +247,8 @@ while running:
             # update the board's states
             GameBoard.update()
             
-            IS_PLAYER_TURN = -1* IS_PLAYER_TURN
-            PF.display_turn(IS_PLAYER_TURN)
-            print(IS_PLAYER_TURN)
+            
+            
 
         # Update the display
         pygame.display.update()
