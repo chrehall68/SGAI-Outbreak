@@ -9,7 +9,7 @@ import time
 import QTrain as qt
 
 SELF_PLAY = True  # whether or not a human will be playing
-player_role = "Zombie"  # Valid options are "Government" and "Zombie"
+player_role = "Government"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
 qtrainer = qt.QTrain(GameBoard)
@@ -50,7 +50,6 @@ while running:
                 x, y = pygame.mouse.get_pos()
                 action = PF.get_action(GameBoard, x, y)
                 
-            
                 if action == "heal" or action == "bite" or action == "kill":
                     # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                     if len(take_action) == 0:
@@ -62,6 +61,8 @@ while running:
                 elif action == "reset move":
                     take_action = []
                     PF.reset_images()
+                elif action == "quit":
+                    running = False
                 elif action is not None:
                     idx = GameBoard.toIndex(action)
                     # action is a coordinate

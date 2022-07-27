@@ -43,6 +43,12 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= RESET_MOVE_COORDS[1]
         and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
     )
+    quit_check = (
+        pixel_x >= QUIT_COORDS[0]
+        and pixel_x <= QUIT_COORDS[0] + QUIT_DIMS[0]
+        and pixel_y >= QUIT_COORDS[1]
+        and pixel_y <= QUIT_COORDS[1] + QUIT_DIMS[1]
+    )
     board_x = int((pixel_x - MARGIN) / CELL_DIMENSIONS[0])
     board_y = int((pixel_y - MARGIN) / CELL_DIMENSIONS[1])
     move_check = (
@@ -60,6 +66,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return "kill"
     elif reset_move_check:
         return "reset move"
+    elif quit_check:
+        return "quit"
     elif move_check:
         return board_x, board_y
     return None
@@ -147,6 +155,7 @@ def run(GameBoard: Board):
     display_text(f"Score: {constants.CURRENT_SCORE}", SCORE_COORDS, 32)
     display_text(f"Last Move:"+str(PREVIOUS_MOVE), LAST_MOVE_COORDS, 25)
     display_text(f"Steps Remaining: {100-constants.number_steps}", STEPS_COORDS, 25)
+    display_text(f"QUIT?", QUIT_COORDS, 25)
     return pygame.event.get()
 
 def display_reset_move_button():
