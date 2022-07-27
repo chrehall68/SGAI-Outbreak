@@ -9,7 +9,7 @@ import time
 import QTrain as qt
 
 SELF_PLAY = True  # whether or not a human will be playing
-player_role = "Zombie"  # Valid options are "Government" and "Zombie"
+player_role = "Government"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
 qtrainer = qt.QTrain(GameBoard)
@@ -316,7 +316,7 @@ while running:
                     r = rd.randint(0, 5)
                 ta = ACTION_SPACE[r]
             else:
-                r = rd.randint(0, 4)
+                r = rd.randint(3, 4)
                 ta = ACTION_SPACE[r]
             poss = GameBoard.get_possible_moves(ta, "Zombie")
 
