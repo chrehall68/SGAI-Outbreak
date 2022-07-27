@@ -5,7 +5,8 @@ from typing import List, Tuple
 from constants import *
 import constants
 
-
+success_of_cure = False
+success_of_bite = False
 class Board:
     def __init__(
         self,
@@ -187,14 +188,14 @@ class Board:
 
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
-            return [False, destination_idx]
+            return [False, destination_idx, None]
 
         # Check if the destination is currently occupied
         if self.States[destination_idx].person is None:
             self.States[destination_idx].person = self.States[start_idx].person
             self.States[start_idx].person = None
-            return [True, destination_idx]
-        return [False, destination_idx]
+            return [True, destination_idx, None]
+        return [False, destination_idx, None]
 
     def moveUp(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         new_coords = (coords[0], coords[1] - 1)
@@ -268,23 +269,26 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
-    def bite(self, coords: Tuple[int, int], stage=3) -> Tuple[bool, int]:
+    def bite(self, coords: Tuple[int, int], stage=3) -> Tuple[bool, int, bool]:
         i = self.toIndex(coords)
+        global success_of_bite
         if (
             self.States[i].person is None
             or self.States[i].person.isZombie
             or not self.isAdjacentTo(coords, True)
         ):
-            return [False, None]
+            return [False, None, None]
         if stage==2:
             if rd.random()<constants.STAGE_2_BITE_RATE:
+                success_of_bite = True
                 self.States[i].person.get_bitten()
         elif stage==3:
             if rd.random()<constants.STAGE_3_BITE_RATE:
+                success_of_bite = True
                 self.States[i].person.get_bitten()
-        return [True, i]
+        return [True, i, success_of_bite]
 
-    def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+    def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int, bool]:
         """
         Cures the person at the stated coordinates.
         If there is a zombie there, the person will be cured.
@@ -293,7 +297,7 @@ class Board:
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
-            return [False, None]
+            return [False, None, None]
         p = self.States[i].person
 
         personAdjacent = False
@@ -301,21 +305,22 @@ class Board:
             if state != None and state.person != None and not state.person.isZombie:
                 personAdjacent = True
         if p.isZombie and personAdjacent:
-            p.get_cured()
+            global success_of_cure
+            success_of_cure = p.get_cured()
         else:
-            return [False, None]
+            return [False, None, None]
         
         constants.CURRENT_SCORE+=SCORE_VALUES["heal"]
 
-        return [True, i]
+        return [True, i, success_of_cure]
 
-    def kill(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+    def kill(self, coords: Tuple[int, int]) -> Tuple[bool, int, bool]:
         """
         KILLS ZOMBIE
         """
         i = self.toIndex(coords)
         if self.States[i].person is None:
-            return [False, None]
+            return [False, None, None]
         p = self.States[i].person
 
         personAdjacent = False
@@ -327,16 +332,16 @@ class Board:
             self.States[i].person = None
             p = None
         else:
-            return [False, None]
+            return [False, None, None]
         
         constants.CURRENT_SCORE+=SCORE_VALUES["kill"]
 
-        return [True, i]
+        return [True, i, True]
     def heuristic_action(self, optimum_state):
         poss_moves = optimum_state.get_possible_moves(self)
         if len(poss_moves)==0:
             return "moveUp"
-        if rd.random()<1:
+        if rd.random()<.9:
             nearest_person_info = optimum_state.get_nearest_person(self)
             if nearest_person_info[1] == 1:
                     return "bite"
@@ -350,13 +355,14 @@ class Board:
                     person_is_isolated = True
             from_opt_to_person = optimum_state.get_direction_to(nearest_person_info[0], self)
 
-            if person_is_isolated and from_opt_to_person in poss_moves:
-                return from_opt_to_person
-            else:
-                if from_opt_to_person in poss_moves and len(poss_moves) > 2:
-                    poss_moves.remove(from_opt_to_person)
+            return from_opt_to_person
+            # if person_is_isolated and from_opt_to_person in poss_moves:
+            #     return from_opt_to_person
+            # else:
+            #     if from_opt_to_person in poss_moves and len(poss_moves) > 2:
+            #         poss_moves.remove(from_opt_to_person)
               
-                return rd.choice(poss_moves)
+            #     return rd.choice(poss_moves)
         else:
             return rd.choice(poss_moves)
             
@@ -374,7 +380,7 @@ class Board:
         if len(zombie_states) == 0:
             return False
         optimum_zombie_state = zombie_states[0]
-        if rd.random() > 1:
+        if rd.random() < .9:
             for state in zombie_states:
                 nearest_person = state.get_nearest_person(self)
                 if nearest_person[1] < dist:
@@ -434,7 +440,7 @@ class Board:
             else:
                 self.States[x].person = None
         used = []
-        amt_zombies = rd.randint(2, 4)
+        amt_zombies = rd.randint(1, 4)
         for x in range(amt_zombies):
             s = rd.randint(0, len(poss) - 1)
             while s in used:
@@ -467,5 +473,12 @@ class Board:
         arr = []
         for i in self.States:
             if i.person is not None and i.person.isZombie == False:
+                arr.append(i)
+        return arr
+    
+    def getZombieStates(self):
+        arr = []
+        for i in self.States:
+            if i.person is not None and i.person.isZombie == True:
                 arr.append(i)
         return arr

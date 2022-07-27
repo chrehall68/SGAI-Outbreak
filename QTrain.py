@@ -80,7 +80,7 @@ class QTrain:
         # action_str = actions[action]
         #coords = self.GameBoard.toCoord(state.location)
 
-        success, new_state_index = self.GameBoard.actionToFunction[
+        success, new_state_index,temp = self.GameBoard.actionToFunction[
             action_str](coords)
         if action_str == "heal" or action_str=="kill":
                 new_state_index = state.location
@@ -149,7 +149,7 @@ class QTrain:
                 action_list.append(action_str)
                 if len(action_list) > 4:
                     action_list.pop(0)
-                success, new_state_index = self.GameBoard.actionToFunction[
+                success, new_state_index, temp = self.GameBoard.actionToFunction[
                     action_str](coords)
                 
                 if action_str == "heal" or action_str=="kill":
