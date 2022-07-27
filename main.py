@@ -110,7 +110,7 @@ while running:
 
             qtrainer.chooseMove(GameBoard.getPlayerStates())
             GameBoard.updateMovesSinceTransformation()
-            time.sleep(.5)
+            time.sleep(.2)
 
             optimum_state = GameBoard.heuristic_state()
             if optimum_state != False:
