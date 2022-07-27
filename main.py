@@ -7,9 +7,10 @@ from constants import *
 import constants
 import time
 import QTrain as qt
+from DataCollection import DataCollection
 
 SELF_PLAY = True  # whether or not a human will be playing
-player_role = "Government"  # Valid options are "Government" and "Zombie"
+player_role = "Zombie"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
 qtrainer = qt.QTrain(GameBoard)
@@ -33,9 +34,19 @@ playerMoved = False
 justStarted = True
 IS_PLAYER_TURN = 1
 
+# DATA COLLECTION OBJECT
+dataCollector = DataCollection(len(GameBoard.getZombieStates()), len(GameBoard.getPlayerStates()))
+
 while running:
     if constants.number_steps>=100:
-        PF.display_win_screen()
+        
+
+        dataCollector.totalScore = constants.CURRENT_SCORE
+        dataCollector.totalMoves = constants.number_steps
+        dataCollector.didWin = True
+
+        PF.display_win_screen(dataCollector)
+
         running = False
         continue
             
@@ -43,7 +54,14 @@ while running:
     PF.display_turn(IS_PLAYER_TURN)
     if SELF_PLAY:
         if not GameBoard.containsPerson(False):
-            PF.display_lose_screen()
+            
+
+            dataCollector.totalScore = constants.CURRENT_SCORE
+            dataCollector.totalMoves = constants.number_steps
+            dataCollector.didWin = False
+
+            PF.display_lose_screen(dataCollector)
+
             running = False
             continue
         # Event Handling
@@ -102,18 +120,50 @@ while running:
         # Action handling
         if player_role == "Zombie":
             if len(GameBoard.getZombieStates()) == 0:
-                PF.display_win_screen()
+                
+
+                dataCollector.totalScore = constants.CURRENT_SCORE
+                dataCollector.totalMoves = constants.number_steps
+                dataCollector.didWin = True
+                
+                PF.display_win_screen(dataCollector)
+
                 running = False
                 continue
             if constants.number_steps>=100:
-                PF.display_win_screen()
+                
+
+                dataCollector.totalScore = constants.CURRENT_SCORE
+                dataCollector.totalMoves = constants.number_steps
+                dataCollector.didWin = True
+
+                PF.display_win_screen(dataCollector)
+
                 running = False
                 continue
             constants.number_steps+=1
 
-            qtrainer.chooseMove(GameBoard.getPlayerStates())
+            move, stage = qtrainer.chooseMove(GameBoard.getPlayerStates())
+
+            if move == "heal":
+                if stage==1:
+                    dataCollector.numType1Cured+=1
+                if stage==2:
+                    dataCollector.numType2Cured+=1
+                if stage==3:
+                    dataCollector.numType3Cured+=1
+            if move=="kill":
+                if stage==1:
+                    dataCollector.numType1Killed+=1
+                if stage==2:
+                    dataCollector.numType2Killed+=1
+                if stage==3:
+                    dataCollector.numType3Killed+=1
+
+            dataCollector.addMove(constants.number_steps, len(GameBoard.getZombieStates()), len(GameBoard.getPlayerStates()), move, stage)
+
             GameBoard.updateMovesSinceTransformation()
-            time.sleep(.2)
+            time.sleep(.5)
 
             optimum_state = GameBoard.heuristic_state()
             if optimum_state != False:
@@ -124,10 +174,16 @@ while running:
                     prev_state = optimum_state
                     optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
                     move_coord = GameBoard.toCoord(optimum_state.location)
-                    GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+                    result = GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+
+                    PF.get_last_move('Zombie','bite',result[2])
+
+                    if result[2]==True:
+                        dataCollector.numPeopleTurnedToZombies+=1
                 else:
                     # Implement the selected action
                     GameBoard.actionToFunction[action](move_coord)
+                    PF.get_last_move('Zombie','move',None)
                 
         else:
             if len(take_action) > 1:
@@ -143,11 +199,31 @@ while running:
                         take_action = []
                         PF.reset_images()
                         GameBoard.updateMovesSinceTransformation()
+                        dataCollector.addMove(constants.number_steps, len(GameBoard.getZombieStates()), len(GameBoard.getPlayerStates()), "move", "N/A")
                         continue
 
                 elif take_action[0] == "heal" or take_action[0]=="kill":
                     if GameBoard.num_zombies() > 1 or not justStarted:
+                        
+                        if take_action[0]=="heal":
+                            if GameBoard.States[GameBoard.toIndex(take_action[1])].person.zombieStage==1:
+                                dataCollector.numType1Cured+=1
+                            elif GameBoard.States[GameBoard.toIndex(take_action[1])].person.zombieStage==2:
+                                dataCollector.numType2Cured+=1
+                            elif GameBoard.States[GameBoard.toIndex(take_action[1])].person.zombieStage==3:
+                                dataCollector.numType3Cured+=1
+                        if take_action[0]=="kill":
+                            if GameBoard.States[GameBoard.toIndex(take_action[1])].person.zombieStage==1:
+                                dataCollector.numType1Killed+=1
+                            elif GameBoard.States[GameBoard.toIndex(take_action[1])].person.zombieStage==2:
+                                dataCollector.numType2Killed+=1
+                            elif GameBoard.States[GameBoard.toIndex(take_action[1])].person.zombieStage==3:
+                                dataCollector.numType3Killed+=1
+
+
                         justStarted = False
+                        
+
                         result = GameBoard.actionToFunction[take_action[0]](take_action[1])
                         
                         print(result)
@@ -159,9 +235,15 @@ while running:
                             PF.get_last_move('Government',take_action[0],result[2])
                         else:
                             PF.get_last_move('Government',None,None)
-                        take_action = []
+                        
                         PF.reset_images()
                         GameBoard.updateMovesSinceTransformation()
+                        dataCollector.addMove(constants.number_steps, len(GameBoard.getZombieStates()), len(GameBoard.getPlayerStates()), take_action[0], GameBoard.States[GameBoard.toIndex(take_action[1])].person.zombieStage)
+                        
+                        
+                        
+                        take_action = []
+                        
                         continue
                     else:
                         take_action = []
@@ -213,7 +295,14 @@ while running:
 
             # no valid moves, player wins
             if len(possible_actions) == 0 and len(possible_move_coords) == 0:
-                PF.display_win_screen()
+                
+
+                dataCollector.totalScore = constants.CURRENT_SCORE
+                dataCollector.totalMoves = constants.number_steps
+                dataCollector.didWin = True
+
+                PF.display_win_screen(dataCollector)
+
                 running = False
                 continue
 
@@ -238,6 +327,8 @@ while running:
                         
                         PF.get_last_move('Zombie','bite',result[2])
                         print(result)
+                        if result[2]==True:
+                            dataCollector.numPeopleTurnedToZombies+=1
                     else:
                         # Implement the selected action
                         GameBoard.actionToFunction[action](move_coord)

@@ -63,13 +63,13 @@ class QTrain:
         coords = self.GameBoard.toCoord(state.location)
         action_str = actions[action]
         if actions[action] == "healRight" or actions[action] == "killRight":
-            coords = [coords[0] + 1, coords[1]]
+            coords = (coords[0] + 1, coords[1])
         elif actions[action] == "healLeft" or actions[action] == "killLeft":
-            coords = [coords[0] - 1, coords[1]]
+            coords = (coords[0] - 1, coords[1])
         elif actions[action] == "healUp" or actions[action] == "killUp":
-            coords = [coords[0], coords[1] - 1]
+            coords = (coords[0], coords[1] - 1)
         elif actions[action] == "healDown" or actions[action] == "killDown":
-            coords = [coords[0], coords[1] + 1]
+            coords = (coords[0], coords[1] + 1)
         if actions[action] == "healRight" or actions[action] == "healLeft" or actions[action] == "healUp" or actions[action] == "healDown":
             action_str = "heal"
         if actions[action] == "killRight" or actions[action] == "killLeft" or actions[action] == "killUp" or actions[action] == "killDown":
@@ -79,6 +79,8 @@ class QTrain:
         #  action = rd.choice(state.get_possible_player_actions(self.GameBoard))
         # action_str = actions[action]
         #coords = self.GameBoard.toCoord(state.location)
+
+        stage = self.GameBoard.States[self.GameBoard.toIndex(coords)].person.zombieStage
 
         success, new_state_index,temp = self.GameBoard.actionToFunction[
             action_str](coords)
@@ -96,6 +98,7 @@ class QTrain:
             except IndexError:
                 print("q_table can't update")
             self.updateCSVFile()
+        return action_str, stage
 
     def train(self):
         action_list = []
