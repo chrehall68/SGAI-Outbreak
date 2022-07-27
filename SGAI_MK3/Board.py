@@ -163,8 +163,12 @@ class Board:
                         ]
                         B.resources = self.resources.clone()
                         
-                elif action == "wall" and state.wall is None:
-                     poss.append(B.toCoord(idx))
+                elif (
+                    action == "wall"
+                    and state.wall is None
+                    and B.isAdjacentTo(B.toCoord(state.location), False)
+                ):
+                    poss.append(B.toCoord(idx))
                    
         return poss
 
@@ -360,7 +364,7 @@ class Board:
         i = self.toIndex(coords)
         if self.States[i].person is not None or not self.isValidCoordinate(coords):
             return [False, None]
-        if self.resources.spendOn("wall"):
+        if self.isAdjacentTo(coords, False) and self.resources.spendOn("wall"):
             w = Wall()
             self.States[i].wall = w
             return [True, i]
