@@ -80,18 +80,21 @@ class QTrain:
         # action_str = actions[action]
         #coords = self.GameBoard.toCoord(state.location)
 
-        print(actions[action])
         success, new_state_index = self.GameBoard.actionToFunction[
             action_str](coords)
+        if action_str == "heal" or action_str=="kill":
+                new_state_index = state.location
         if DoubleQ:
             wasBitten = True if state.person is not None and state.person.isZombie else False
 
             reward = self.assign_reward_realtime(success, action, wasBitten)
-
-            self.qtable[state.location][action] = (1 - learning_rate) * self.qtable[
-                state.location][action] + learning_rate * (
-                    reward +
-                    discount_rate * np.max(self.qtable[new_state_index]))
+            try:
+                self.qtable[state.location][action] = (1 - learning_rate) * self.qtable[
+                    state.location][action] + learning_rate * (
+                        reward +
+                        discount_rate * np.max(self.qtable[new_state_index]))
+            except IndexError:
+                print("q_table can't update")
             self.updateCSVFile()
 
     def train(self):
@@ -142,8 +145,7 @@ class QTrain:
                     coords[1]=5
                 if coords[1]<0:
                     coords[1]=0
-                if action_str is "heal":
-                    print("healed")
+                    
                 action_list.append(action_str)
                 if len(action_list) > 4:
                     action_list.pop(0)
