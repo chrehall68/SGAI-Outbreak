@@ -40,7 +40,7 @@ SCORE_VALUES = { # TEMPORARY VALUES
 }
 TIME_BETWEEN_ZOMBIE_MOVE = 1000 # ms
 
-CURE_SUCCESS_RATES = [1, .75, .5, .25] # these are temporary values
+CURE_SUCCESS_RATES = [1, 1, 1, 1] # these are temporary values
 
 NUM_MOVES_UNTIL_STAGE_2 = 2
 NUM_MOVES_UNTIL_STAGE_3 = 3

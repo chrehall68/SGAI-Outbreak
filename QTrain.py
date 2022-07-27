@@ -2,7 +2,7 @@ import numpy as np
 import random as rd
 import csv
 
-episodes = 1000
+episodes = 500
 steps_per_game = 100
 
 #Update qtable Values
@@ -13,7 +13,7 @@ action_size = 12
 
 max_exploration_rate = 1
 min_exploration_rate = .01
-exploration_decay_rate = .01
+exploration_decay_rate = .001
 
 actions = [
     "moveRight", "moveLeft", "moveUp", "moveDown", "healRight", "healLeft",
@@ -28,6 +28,7 @@ class QTrain:
         self.readCSVFile()
         self.exploration_rate = 1
         self.GameBoard = GameBoard
+        self.DoubleQ = True
         print(len(self.qtable))
 
     # TRAINING
@@ -43,6 +44,7 @@ class QTrain:
             self.qtable = tab
 
     def chooseMove(self, possible_states):
+        DoubleQ = self.DoubleQ
         player_states = possible_states  # contains all the states with people on it
         if(len(player_states) == 0):
             return
@@ -51,10 +53,13 @@ class QTrain:
         for curr_state in player_states:  # 0 to 35
             for q in curr_state.get_possible_player_actions(self.GameBoard):  # 0 to 5
                 if self.qtable[curr_state.location][q] > max_q_action:
-                    max_q_state = curr_state
-                    max_q_action = q
-        action = max_q_action
+                    if (rd.random() > 0.9 or q in range(5,12) or not DoubleQ) and len(curr_state.get_possible_player_actions(self.GameBoard)) > 1:
+                        max_q_state = curr_state
+                        max_q_action = q
+        
         state = max_q_state
+        action = max_q_action
+        
         coords = self.GameBoard.toCoord(state.location)
         action_str = actions[action]
         if actions[action] == "healRight" or actions[action] == "killRight":
@@ -78,6 +83,16 @@ class QTrain:
         print(actions[action])
         success, new_state_index = self.GameBoard.actionToFunction[
             action_str](coords)
+        if DoubleQ:
+            wasBitten = True if state.person is not None and state.person.isZombie else False
+
+            reward = self.assign_reward_realtime(success, action, wasBitten)
+
+            self.qtable[state.location][action] = (1 - learning_rate) * self.qtable[
+                state.location][action] + learning_rate * (
+                    reward +
+                    discount_rate * np.max(self.qtable[new_state_index]))
+            self.updateCSVFile()
 
     def train(self):
         action_list = []
@@ -127,7 +142,8 @@ class QTrain:
                     coords[1]=5
                 if coords[1]<0:
                     coords[1]=0
-                
+                if action_str is "heal":
+                    print("healed")
                 action_list.append(action_str)
                 if len(action_list) > 4:
                     action_list.pop(0)
@@ -189,13 +205,27 @@ class QTrain:
         if success == True and action < 4:  # successful move
             total_reward += -25
         if action in [4,5,6,7]:  # heal
-            total_reward += 250
+            total_reward += 1000
         if action in [8,9,10,11]:  # kill
-            total_reward += 50
+            total_reward -= 250
         if self.check_win(step):
-            total_reward += 1000-step*2+len(livingPeople)*10
+            total_reward += 1000-step*2+len(livingPeople)*100
         if len(actList) is 4 and actList[2] is not actList[3] and actList[2:3] is actList[0:1]:
-            total_reward -= 50
+            total_reward -= 100
+        return total_reward
+    
+    def assign_reward_realtime(self, success, action, wasBitten):
+        total_reward = 0
+        if wasBitten == True:
+            total_reward -= 500
+        if success == False and action < 4:  # invalid move
+            total_reward -= 1000
+        if success == True and action < 4:  # successful move
+            total_reward += -25
+        if action in [4,5,6,7]:  # heal
+            total_reward += 1000
+        if action in [8,9,10,11]:  # kill
+            total_reward -= 250
         return total_reward
 
     def check_win(self, step):

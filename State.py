@@ -66,7 +66,6 @@ class State:
         rightCoords = GameBoard.toIndex((self_coords[0]+1, self_coords[1]))
         leftCoords = GameBoard.toIndex((self_coords[0]-1, self_coords[1]))
 
-        print(other_state.distance(GameBoard, upCoords), other_state.distance(GameBoard, downCoords),other_state.distance(GameBoard, rightCoords),other_state.distance(GameBoard, leftCoords))
 
         min_coords = min(other_state.distance(GameBoard, upCoords), other_state.distance(GameBoard, downCoords),other_state.distance(GameBoard, rightCoords),other_state.distance(GameBoard, leftCoords))
         if min_coords == upCoords:
