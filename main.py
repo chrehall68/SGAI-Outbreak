@@ -98,6 +98,7 @@ while running:
 
         # Action handling
         if player_role == "Zombie":
+            time.sleep(.5)
             if len(GameBoard.getZombieStates()) == 0:
                 PF.display_win_screen()
                 running = False
@@ -125,7 +126,7 @@ while running:
                 else:
                     # Implement the selected action
                     GameBoard.actionToFunction[action](move_coord)
-                
+            
         else:
             if len(take_action) > 1:
                 if take_action[0] == "move":
