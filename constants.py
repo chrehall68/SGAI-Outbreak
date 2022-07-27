@@ -36,13 +36,17 @@ STEPS_COORDS = (10, 50)
 #STEPS_COORDS = (800, 750)
 CURRENT_SCORE = 0
 SCORE_VALUES = { # TEMPORARY VALUES
-    "heal":100,
-    "kill":100,
-    "move":0
+    "heal":250,
+    "kill":-100,
+    "move":-25,
+    "bite":-500,
+    "repetitiveMove":-50
+
+
 }
 TIME_BETWEEN_ZOMBIE_MOVE = 1000 # ms
 
-CURE_SUCCESS_RATES = [1, 1, 1, 1] # these are temporary values
+CURE_SUCCESS_RATES = [1, 0.9, 0.8, 0.5] # these are temporary values
 
 NUM_MOVES_UNTIL_STAGE_2 = 2
 NUM_MOVES_UNTIL_STAGE_3 = 3

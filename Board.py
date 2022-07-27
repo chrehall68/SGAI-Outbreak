@@ -195,6 +195,8 @@ class Board:
             self.States[destination_idx].person = self.States[start_idx].person
             self.States[start_idx].person = None
             return [True, destination_idx, None]
+
+        constants.CURRENT_SCORE+=SCORE_VALUES["move"]
         return [False, destination_idx, None]
 
     def moveUp(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
@@ -286,7 +288,9 @@ class Board:
             if rd.random()<constants.STAGE_3_BITE_RATE:
                 success_of_bite = True
                 self.States[i].person.get_bitten()
+        constants.CURRENT_SCORE+=SCORE_VALUES["bite"]
         return [True, i, success_of_bite]
+        
 
     def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int, bool]:
         """

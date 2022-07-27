@@ -9,7 +9,7 @@ import time
 import QTrain as qt
 
 SELF_PLAY = True  # whether or not a human will be playing
-player_role = "Zombie"  # Valid options are "Government" and "Zombie"
+player_role = "Government"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
 qtrainer = qt.QTrain(GameBoard)
@@ -98,6 +98,7 @@ while running:
 
         # Action handling
         if player_role == "Zombie":
+            time.sleep(.3)
             if len(GameBoard.getZombieStates()) == 0:
                 PF.display_win_screen()
                 running = False
@@ -110,7 +111,7 @@ while running:
 
             qtrainer.chooseMove(GameBoard.getPlayerStates())
             GameBoard.updateMovesSinceTransformation()
-            time.sleep(.2)
+            time.sleep(.3)
 
             optimum_state = GameBoard.heuristic_state()
             if optimum_state != False:
@@ -125,7 +126,7 @@ while running:
                 else:
                     # Implement the selected action
                     GameBoard.actionToFunction[action](move_coord)
-                
+            
         else:
             if len(take_action) > 1:
                 if take_action[0] == "move":
