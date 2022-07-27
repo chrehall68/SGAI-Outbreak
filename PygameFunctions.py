@@ -1,5 +1,6 @@
 from typing import List, Tuple
 import pygame
+from sqlalchemy import true
 from constants import *
 from Board import Board
 import constants
@@ -8,12 +9,13 @@ import constants
 screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
 pygame.display.set_caption("Outbreak!")
 pygame.font.init()
-font = pygame.font.SysFont("Comic Sans", 20)
+font = pygame.font.Font("Assets/MagiBlade.ttf", 30)
 screen.fill(BACKGROUND)
 
 HEART_SELECTED = False
 SKULL_SELECTED = False
 
+IS_TURN = True
 PREVIOUS_MOVE = ' '
 
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
@@ -100,7 +102,7 @@ def get_last_move(player, move, success):
 
 
 def display_text (text, coords, font_size):
-    font_temp = pygame.font.Font("freesansbold.ttf", font_size)
+    font_temp = pygame.font.Font("Assets/Magiblade.ttf", font_size)
     score = font_temp.render(text, True, (255,255,255))
     screen.blit(score, coords)
 
@@ -125,6 +127,10 @@ def run(GameBoard: Board):
         else:
             display_image(screen, "Assets/skull icon.png", CURE_BITE_DIMS, KILL_COORDS)
 
+        if IS_TURN:
+            display_image(screen, "Assets/yourturn.png", TURN_INDICATOR_DIMS, TURN_INDICATOR_COORDS)
+        else:
+            display_image(screen, "Assets/theirturn.png", TURN_INDICATOR_DIMS, TURN_INDICATOR_COORDS)
         
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
@@ -307,3 +313,11 @@ def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
         return "moveRight"
     elif coord2[0] < coord1[0]:
         return "moveLeft"
+
+def display_turn(myturn):
+    global IS_TURN
+    if myturn == 1:
+        IS_TURN = True
+    else:
+        IS_TURN - False
+    
