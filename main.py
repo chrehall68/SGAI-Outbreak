@@ -317,7 +317,7 @@ while running:
                     r = rd.randint(0, 5)
                 ta = ACTION_SPACE[r]
             else:
-                r = rd.randint(0, 4)
+                r = rd.randint(3, 4)
                 ta = ACTION_SPACE[r]
             poss = GameBoard.get_possible_moves(ta, "Zombie")
 
