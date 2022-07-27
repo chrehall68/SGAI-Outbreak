@@ -15,6 +15,8 @@ GameBoard = Board((ROWS, COLUMNS), player_role)
 qtrainer = qt.QTrain(GameBoard)
 GameBoard.populate()
 
+
+
 # Self play variables
 alpha = 0.1
 gamma = 0.6
@@ -29,7 +31,7 @@ running = True
 take_action = []
 playerMoved = False
 justStarted = True
-
+IS_PLAYER_TURN = 1
 
 while running:
     if constants.number_steps>=100:
@@ -38,6 +40,7 @@ while running:
         continue
             
     P = PF.run(GameBoard)
+    PF.display_turn(IS_PLAYER_TURN)
     if SELF_PLAY:
         if not GameBoard.containsPerson(False):
             PF.display_lose_screen()
@@ -133,8 +136,10 @@ while running:
                     if len(take_action) > 2:
                         directionToMove = PF.direction(take_action[1], take_action[2])
                         result = GameBoard.actionToFunction[directionToMove](take_action[1])
+                        
                         if result[0] is not False:
                             playerMoved = True
+                            
                         PF.get_last_move('Government',take_action[0],None)
                         take_action = []
                         PF.reset_images()
@@ -145,10 +150,12 @@ while running:
                     if GameBoard.num_zombies() > 1 or not justStarted:
                         justStarted = False
                         result = GameBoard.actionToFunction[take_action[0]](take_action[1])
+                        
                         print(result)
                         print(take_action[0])
                         if result[0] is not False:
                             playerMoved = True
+                            
                         if (result[2] is not None):
                             PF.get_last_move('Government',take_action[0],result[2])
                         else:
@@ -163,8 +170,10 @@ while running:
 
                 elif take_action[0] == "bite":
                     result = GameBoard.actionToFunction[take_action[0]](take_action[1])
+                    
                     if result[0] is not False:
                         playerMoved = True
+                        
                     take_action = []
                     PF.reset_images()
                     continue
@@ -177,7 +186,12 @@ while running:
             take_action = []
             PF.reset_images()
             GameBoard.update() # UPDATE BOARD BEFORE ZOMBIE MOVE SO THE DELAY CAN HAPPEN
+            
+            IS_PLAYER_TURN = -1* IS_PLAYER_TURN
+            PF.display_turn(IS_PLAYER_TURN)
+            print(IS_PLAYER_TURN)
             pygame.display.update()
+            
             # PF.run(GameBoard) # do this to update display
 
             time.sleep(1)
@@ -222,6 +236,7 @@ while running:
                         optimum_state = optimum_state.get_nearest_person(GameBoard)[0]
                         move_coord = GameBoard.toCoord(optimum_state.location)
                         result = GameBoard.actionToFunction[action](move_coord, prev_state.person.zombieStage)
+                        
                         PF.get_last_move('Zombie','bite',result[2])
                         print(result)
                     else:
@@ -234,6 +249,10 @@ while running:
 
             # update the board's states
             GameBoard.update()
+            
+            IS_PLAYER_TURN = -1* IS_PLAYER_TURN
+            PF.display_turn(IS_PLAYER_TURN)
+            print(IS_PLAYER_TURN)
 
         # Update the display
         pygame.display.update()

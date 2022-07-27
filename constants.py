@@ -8,10 +8,10 @@ ROLE_TO_ROLE_NUM = {"Government": 1, "Zombie": -1}
 ROLE_TO_ROLE_BOOLEAN = {"Government": False, "Zombie": True}
 
 # Pygame constants
-BACKGROUND = "#DDC2A1"
+BACKGROUND = "#1C1C1C"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-CELL_COLOR = (233, 222, 188)
+CELL_COLOR = (100, 100, 100)
 LINE_WIDTH = 5
 IMAGE_ASSETS = [
     "person_normal.png",
@@ -58,3 +58,6 @@ HEART_SELECTED = False
 SKULL_SELECTED = False
 
 number_steps = 0
+
+TURN_INDICATOR_DIMS = (231,100)
+TURN_INDICATOR_COORDS = (800,100)
