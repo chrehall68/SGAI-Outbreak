@@ -29,6 +29,37 @@ class State:
                         smallest_dist = d
         return smallest_dist
 
+    # returns the number of moves a person/zombie would have to take to get to another person/zombie
+    # "zombie" is for whether to look for the nearest zombie or person
+    def nearest_person(self, GameBoard, zombie: bool):
+        location = self.location
+        dRow = [-1, 0, 1, 0]
+        dCol = [0, 1, 0, -1]
+        visited = [False for i in range(36)]
+        toVisit = [[location, 0]] # current location, num moves to get there
+        visited[location] = True
+        while len(toVisit) > 0:
+            loc, moves = toVisit.pop(0)
+            visited[loc] = True
+            for i in range(4):
+                coords = list(GameBoard.toCoord(loc))
+                coords[0] += dRow[i]
+                coords[1] += dCol[i]
+                newLoc = GameBoard.toIndex(coords)
+                if GameBoard.isValidCoordinate(coords):
+                    if visited[newLoc] == False:
+                        visited[newLoc] = True
+                        if (GameBoard.States[newLoc].person != None
+                            and GameBoard.States[newLoc].person.isZombie == zombie
+                        ):
+                            return moves
+                        if (GameBoard.States[newLoc].wall == None
+                            and GameBoard.States[newLoc].person == None
+                        ):
+                            toVisit.append([newLoc, moves + 1])
+        # no possible path
+        return None
+
     def evaluate(self, action: str, GameBoard):
         reward = 0
         reward += self.nearest_zombie(GameBoard) - 3
@@ -68,7 +99,9 @@ class State:
 
     def clone(self):
         if self.wall is not None:
-            return State(self.wall, self.location)
+            s = State(None, self.location)
+            s.wall = self.wall
+            return s
         elif self.person is None:
             return State(self.person, self.location)
         return State(self.person.clone(), self.location)
