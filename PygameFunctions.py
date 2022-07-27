@@ -8,7 +8,7 @@ import constants
 screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
 pygame.display.set_caption("Outbreak!")
 pygame.font.init()
-font = pygame.font.SysFont("Comic Sans", 20)
+font = pygame.font.Font("Assets/MagiBlade.ttf", 30)
 screen.fill(BACKGROUND)
 
 HEART_SELECTED = False
@@ -100,7 +100,7 @@ def get_last_move(player, move, success):
 
 
 def display_text (text, coords, font_size):
-    font_temp = pygame.font.Font("freesansbold.ttf", font_size)
+    font_temp = pygame.font.Font("Assets/Magiblade.ttf", font_size)
     score = font_temp.render(text, True, (255,255,255))
     screen.blit(score, coords)
 

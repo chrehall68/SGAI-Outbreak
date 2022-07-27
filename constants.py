@@ -8,10 +8,10 @@ ROLE_TO_ROLE_NUM = {"Government": 1, "Zombie": -1}
 ROLE_TO_ROLE_BOOLEAN = {"Government": False, "Zombie": True}
 
 # Pygame constants
-BACKGROUND = "#DDC2A1"
+BACKGROUND = "#1C1C1C"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-CELL_COLOR = (233, 222, 188)
+CELL_COLOR = (100, 100, 100)
 LINE_WIDTH = 5
 IMAGE_ASSETS = [
     "person_normal.png",
@@ -42,7 +42,7 @@ SCORE_VALUES = { # TEMPORARY VALUES
 }
 TIME_BETWEEN_ZOMBIE_MOVE = 1000 # ms
 
-CURE_SUCCESS_RATES = [1, 1, 1, 1] # these are temporary values
+CURE_SUCCESS_RATES = [1, 0.75, 0.5, 0.25] # these are temporary values
 
 NUM_MOVES_UNTIL_STAGE_2 = 2
 NUM_MOVES_UNTIL_STAGE_3 = 3
