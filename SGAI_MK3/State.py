@@ -7,6 +7,7 @@ class State:
     def __init__(self, p: Person, i) -> None:
         self.person = p
         self.location = i
+        self.wall = None
         pass
 
     def distance(self, GameBoard, other_location: int):
@@ -66,7 +67,9 @@ class State:
         return moves
 
     def clone(self):
-        if self.person is None:
+        if self.wall is not None:
+            return State(self.wall, self.location)
+        elif self.person is None:
             return State(self.person, self.location)
         return State(self.person.clone(), self.location)
 
@@ -82,6 +85,11 @@ class State:
         """
         If this has a person, update the person within.
         """
-        if self.person is None:
+        if self.wall is not None:
+            ret = self.wall.update()
+            if not ret:
+                self.wall = None
+            return
+        elif self.person is None:
             return
         self.person.update()
