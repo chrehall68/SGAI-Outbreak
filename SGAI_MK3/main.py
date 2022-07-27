@@ -51,7 +51,7 @@ while running:
                 if event.type == pygame.MOUSEBUTTONUP:
                     x, y = pygame.mouse.get_pos()
                     action = PF.get_action(GameBoard, x, y)
-                    if action == "heal" or action == "bite":
+                    if action == "heal" or action == "bite" or action == "wall":
                         # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                         if len(take_action) == 0:
                             take_action.append(action)
@@ -99,6 +99,16 @@ while running:
                         playerMoved = True
                     take_action = []
 
+                elif (
+                    take_action[0] == "heal"
+                    or take_action[0] == "bite"
+                    or take_action[0] == "wall"
+                ):
+                    result = GameBoard.actionToFunction[take_action[0]](take_action[1])
+                    if result[0] is not False:
+                        playerMoved = True
+                    take_action = []
+
         # Computer turn
         else:
             playerMoved = False
@@ -112,7 +122,6 @@ while running:
                 continue
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
-
             # update the board's states
             GameBoard.update()
 

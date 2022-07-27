@@ -2,6 +2,7 @@ from Resources import Resources
 from State import State
 import random as rd
 from Person import Person
+from Wall import Wall
 from typing import List, Tuple
 from constants import *
 import random
@@ -35,6 +36,7 @@ class Board:
             "moveRight": self.moveRight,
             "heal": self.heal,
             "bite": self.bite,
+            "wall": self.wall,
         }
         self.resources = Resources(4)
 
@@ -102,7 +104,7 @@ class Board:
         """
         Get the coordinates of people (or zombies) that are able
         to make the specified move.
-        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', and 'heal')
+        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', 'heal', and 'wall')
         @param role - either 'Zombie' or 'Government'; helps decide whether an action
         is valid and which people/zombies it applies to
         """
@@ -171,6 +173,7 @@ class Board:
                         changed_states = True
                     elif (
                         action != "heal"
+                        and action != "wall"
                         and not state.person.isZombie
                         and B.actionToFunction[action](B.toCoord(idx))[0]
                     ):
@@ -186,6 +189,10 @@ class Board:
                             for i in range(len(self.States))
                         ]
                         B.resources = self.resources.clone()
+
+                elif action == "wall" and state.wall is None:
+                    poss.append(B.toCoord(idx))
+
         return poss
 
     def toCoord(self, i: int):
@@ -256,7 +263,10 @@ class Board:
             return [False, destination_idx]
 
         # Check if the destination is currently occupied
-        if self.States[destination_idx].person is None:
+        if (
+            self.States[destination_idx].person is None
+            and self.States[destination_idx].wall is None
+        ):
             self.States[destination_idx].person = self.States[start_idx].person
             self.States[start_idx].person = None
             return [True, destination_idx]
@@ -328,6 +338,16 @@ class Board:
                 return [False, i]
         return [True, i]
 
+    def wall(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        i = self.toIndex(coords)
+        if self.States[i].person is not None or not self.isValidCoordinate(coords):
+            return [False, None]
+        if self.resources.spendOn("wall"):
+            w = Wall()
+            self.States[i].wall = w
+            return [True, i]
+        return [False, None]
+
     def populate(self, num_people=-1, num_zombies=4):
         """
         Populate the board
@@ -377,7 +397,8 @@ class Board:
 
     def get_board(self):
         """
-        Returns an array from [0, 3]
+        Returns an array from [0, 4]
+        4 means that the slot has a wall in it
         3 means that the slot is empty but is a vax space
         2 means that there is a zombie in the space
         1 means that there is a person in the space
@@ -386,8 +407,8 @@ class Board:
         s = []
         for i in range(len(self.States)):
             state = self.States[i]
-            # if state.wall != None:
-            #    s.append(4)
+            if state.wall != None:
+                s.append(4)
             if state.person is not None:
                 if state.person.isZombie:
                     s.append(2)

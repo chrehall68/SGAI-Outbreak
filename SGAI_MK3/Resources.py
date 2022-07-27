@@ -8,7 +8,7 @@ class Resources:
 
     def __init__(self, starting_resources: int):
         self.resources = starting_resources
-        self.costs = {"cure": rd.randint(5, 10), "vaccinate": rd.randint(5, 10)}
+        self.costs = {"cure": rd.randint(5, 10), "vaccinate": rd.randint(5, 10), "wall": rd.randint(3,10)}
 
     def spendOn(self, item: str) -> bool:
         """
