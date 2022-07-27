@@ -31,24 +31,29 @@ CUR_MOVE_COORDS = (800, 400)
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
 SCORE_DIMS = (200,100)
 SCORE_COORDS = (950, 10)
+TRY_AGAIN_COORDS = (950, 50)
 LAST_MOVE_COORDS = (10, 10)
 STEPS_COORDS = (10, 50)
 #STEPS_COORDS = (800, 750)
 CURRENT_SCORE = 0
 SCORE_VALUES = { # TEMPORARY VALUES
-    "heal":100,
-    "kill":100,
-    "move":0
+    "heal":250,
+    "kill":-100,
+    "move":-25,
+    "bite":-500,
+    "repetitiveMove":-50
+
+
 }
 TIME_BETWEEN_ZOMBIE_MOVE = 1000 # ms
 
-CURE_SUCCESS_RATES = [1, 0.75, 0.5, 0.25] # these are temporary values
+CURE_SUCCESS_RATES = [1, 0.9, 0.8, 0.5] # these are temporary values
 
 NUM_MOVES_UNTIL_STAGE_2 = 2
 NUM_MOVES_UNTIL_STAGE_3 = 3
 
 STAGE_2_BITE_RATE = .5
-STAGE_3_BITE_RATE = 1
+STAGE_3_BITE_RATE = 0.75
 
 HEART_SELECTED = False
 SKULL_SELECTED = False
@@ -56,4 +61,7 @@ SKULL_SELECTED = False
 number_steps = 0
 
 TURN_INDICATOR_DIMS = (231,100)
-TURN_INDICATOR_COORDS = (800,100)
+TURN_INDICATOR_COORDS = (850,480)
+
+QUIT_COORDS = (800, 650)
+QUIT_DIMS = (80, 50)

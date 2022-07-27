@@ -33,25 +33,22 @@ take_action = []
 playerMoved = False
 justStarted = True
 IS_PLAYER_TURN = 1
+lose = False
 
 # DATA COLLECTION OBJECT
 dataCollector = DataCollection(len(GameBoard.getZombieStates()), len(GameBoard.getPlayerStates()))
 
 while running:
-    if constants.number_steps>=100:
-        
-
+    if constants.number_steps>=100 or lose:
         dataCollector.totalScore = constants.CURRENT_SCORE
         dataCollector.totalMoves = constants.number_steps
         dataCollector.didWin = True
 
         PF.display_win_screen(dataCollector)
-
         running = False
         continue
             
     P = PF.run(GameBoard)
-    PF.display_turn(IS_PLAYER_TURN)
     if SELF_PLAY:
         if not GameBoard.containsPerson(False):
             
@@ -70,7 +67,6 @@ while running:
                 x, y = pygame.mouse.get_pos()
                 action = PF.get_action(GameBoard, x, y)
                 
-            
                 if action == "heal" or action == "bite" or action == "kill":
                     # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                     if len(take_action) == 0:
@@ -82,6 +78,11 @@ while running:
                 elif action == "reset move":
                     take_action = []
                     PF.reset_images()
+                elif action == "try again":
+                    GameBoard.resetBoard()
+                    GameBoard.populate()
+                elif action == "quit":
+                    running = False
                 elif action is not None:
                     idx = GameBoard.toIndex(action)
                     # action is a coordinate
@@ -119,6 +120,7 @@ while running:
 
         # Action handling
         if player_role == "Zombie":
+            time.sleep(.3)
             if len(GameBoard.getZombieStates()) == 0:
                 
 
@@ -268,9 +270,8 @@ while running:
             PF.reset_images()
             GameBoard.update() # UPDATE BOARD BEFORE ZOMBIE MOVE SO THE DELAY CAN HAPPEN
             
-            IS_PLAYER_TURN = -1* IS_PLAYER_TURN
-            PF.display_turn(IS_PLAYER_TURN)
-            print(IS_PLAYER_TURN)
+            
+            
             pygame.display.update()
             
             # PF.run(GameBoard) # do this to update display
@@ -340,9 +341,8 @@ while running:
             # update the board's states
             GameBoard.update()
             
-            IS_PLAYER_TURN = -1* IS_PLAYER_TURN
-            PF.display_turn(IS_PLAYER_TURN)
-            print(IS_PLAYER_TURN)
+            
+            
 
         # Update the display
         pygame.display.update()
@@ -410,7 +410,7 @@ while running:
                     r = rd.randint(0, 5)
                 ta = ACTION_SPACE[r]
             else:
-                r = rd.randint(0, 4)
+                r = rd.randint(3, 4)
                 ta = ACTION_SPACE[r]
             poss = GameBoard.get_possible_moves(ta, "Zombie")
 

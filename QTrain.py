@@ -1,6 +1,7 @@
 import numpy as np
 import random as rd
 import csv
+import constants
 
 episodes = 500
 steps_per_game = 100
@@ -204,19 +205,19 @@ class QTrain:
     def assign_reward(self, success, action, step, wasBitten, actList, livingPeople):
         total_reward = 0
         if wasBitten == True:
-            total_reward -= 500
+            total_reward += constants.SCORE_VALUES["bite"]
         if success == False and action < 4:  # invalid move
             total_reward -= 1000
         if success == True and action < 4:  # successful move
-            total_reward += -25
+            total_reward += constants.SCORE_VALUES["move"]
         if action in [4,5,6,7]:  # heal
-            total_reward += 1000
+            total_reward += constants.SCORE_VALUES["heal"]
         if action in [8,9,10,11]:  # kill
-            total_reward -= 250
+            total_reward += constants.SCORE_VALUES["kill"]
         if self.check_win(step):
             total_reward += 1000-step*2+len(livingPeople)*100
         if len(actList) is 4 and actList[2] is not actList[3] and actList[2:3] is actList[0:1]:
-            total_reward -= 100
+            total_reward += constants.SCORE_VALUES["repetitiveMove"]
         return total_reward
     
     def assign_reward_realtime(self, success, action, wasBitten):
