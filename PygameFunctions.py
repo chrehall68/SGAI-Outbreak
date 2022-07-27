@@ -1,6 +1,5 @@
 from typing import List, Tuple
 import pygame
-from sqlalchemy import true
 from constants import *
 from Board import Board
 import constants
@@ -50,6 +49,12 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= RESET_MOVE_COORDS[1]
         and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
     )
+    quit_check = (
+        pixel_x >= QUIT_COORDS[0]
+        and pixel_x <= QUIT_COORDS[0] + QUIT_DIMS[0]
+        and pixel_y >= QUIT_COORDS[1]
+        and pixel_y <= QUIT_COORDS[1] + QUIT_DIMS[1]
+    )
     board_x = int((pixel_x - MARGIN) / CELL_DIMENSIONS[0])
     board_y = int((pixel_y - MARGIN) / CELL_DIMENSIONS[1])
     move_check = (
@@ -67,6 +72,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return "kill"
     elif reset_move_check:
         return "reset move"
+    elif quit_check:
+        return "quit"
     elif move_check:
         return board_x, board_y
     elif try_again_check:
@@ -98,16 +105,23 @@ def display_curr_action(act):
 
 def get_last_move(player, move, success):
     global PREVIOUS_MOVE
+    global IS_TURN
     if (move == None and success == None):
         PREVIOUS_MOVE = ' INVALID MOVE!'
+        IS_TURN = True
     elif (move == 'move'):
         if (player == 'Government'):
             PREVIOUS_MOVE = ' Just made a valid move!'
+            IS_TURN = False
         else:
             PREVIOUS_MOVE = ' Zombie just made a move!'
+            IS_TURN = True
     else:
         PREVIOUS_MOVE = ' The last move was ' + str(move) +' and it was a success: '+ str(success)
-
+        if (player == 'Government'):
+            IS_TURN = False
+        else:
+            IS_TURN = True
 
 def display_text (text, coords, font_size):
     font_temp = pygame.font.Font("Assets/Magiblade.ttf", font_size)
@@ -150,6 +164,7 @@ def run(GameBoard: Board):
     display_text(f"Try Again?", TRY_AGAIN_COORDS, 32)
     display_text(f"Last Move:"+str(PREVIOUS_MOVE), LAST_MOVE_COORDS, 25)
     display_text(f"Steps Remaining: {100-constants.number_steps}", STEPS_COORDS, 25)
+    display_text(f"QUIT?", QUIT_COORDS, 25)
     return pygame.event.get()
 
 def display_reset_move_button():
