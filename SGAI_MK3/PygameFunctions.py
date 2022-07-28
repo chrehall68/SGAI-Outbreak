@@ -211,6 +211,8 @@ def display_grid(GameBoard: Board):
         bgcolor = BACKGROUND
         if idx in GameBoard.getSafeEdge():
             bgcolor = VAX_COLOR
+        else:
+            bgcolor = CELL_COLOR
         person = GameBoard.personAtIdx(idx)
         if person is not None:
             # there is a person, so draw the person
