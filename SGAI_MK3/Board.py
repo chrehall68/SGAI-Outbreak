@@ -344,7 +344,7 @@ class Board:
 
     def wall(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         i = self.toIndex(coords)
-        if self.States[i].person is not None or not self.isValidCoordinate(coords):
+        if not self.isValidCoordinate(coords) or self.States[i].person is not None:
             return [False, None]
         if self.isAdjacentTo(coords, False) and self.resources.spendOn("wall"):
             w = Wall()
