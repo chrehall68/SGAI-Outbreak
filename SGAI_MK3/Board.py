@@ -424,3 +424,5 @@ class Board:
             if s[i] == 0:
                 s[i] = 3
         return s
+    def __str__(self):
+        return self.get_board()
