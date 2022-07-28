@@ -411,18 +411,19 @@ class Board:
         s = []
         for i in range(len(self.States)):
             state = self.States[i]
-            if state.wall != None:
-                s.append(4)
-            if state.person is not None:
+            to_add = 0  # assume that state is empty
+            if state.wall is not None:
+                to_add = 4
+            elif state.person is not None:
                 if state.person.isZombie:
-                    s.append(2)
+                    to_add = 2
                 else:
-                    s.append(1)
-            else:
-                s.append(0)
+                    to_add = 1
+            s.append(to_add)
         for i in self.getSafeEdge():
             if s[i] == 0:
                 s[i] = 3
         return s
+
     def __str__(self):
-        return self.get_board()
+        return str(self.get_board())
