@@ -304,8 +304,3 @@ def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
     elif coord2[0] < coord1[0]:
         return "moveLeft"
 
-def display_wall(coords):
-    dims = (CELL_DIMENSIONS[0] - LINE_WIDTH, CELL_DIMENSIONS[1] - LINE_WIDTH)
-    new_coords = (coords[0] + LINE_WIDTH, coords[1] + LINE_WIDTH)
-    display_image(screen, "Assets/wall.jpg", dims, new_coords)
-

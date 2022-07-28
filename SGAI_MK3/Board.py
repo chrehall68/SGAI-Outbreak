@@ -347,7 +347,6 @@ class Board:
                     else:
                         print("Cure Failed")
                         self.telemetry = "Cure Failed!"
-                        return [False, None]
                 else:
                     return [False, None]
             else:
