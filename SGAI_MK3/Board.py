@@ -43,6 +43,7 @@ class Board:
             "wall": self.wall
         }
         self.resources = Resources(4)
+        self.telemetry = "TEST"
 
     def getSafeEdge(self):
         return self.safeEdge
@@ -345,6 +346,7 @@ class Board:
                         p.get_cured()
                     else:
                         print("Cure Failed")
+                        self.telemetry = "Cure Failed!"
                         return [False, None]
                 else:
                     return [False, None]

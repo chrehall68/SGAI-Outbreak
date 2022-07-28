@@ -26,6 +26,7 @@ CURE_BITE_COORDS = (950, 200)
 CURE_BITE_DIMS = (200, 200)
 CELL_DIMENSIONS = (100, 100)  # number of pixels (x, y) for each cell
 CUR_MOVE_COORDS = (800, 400)
+TELEMETRY_COORDS = (800, 200) # telemetry: feedback stuff ex) cure failed, etc.
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
 
 WALL_BUTTON_DIMS = (200, 50)

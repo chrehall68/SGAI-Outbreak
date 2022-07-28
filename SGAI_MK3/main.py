@@ -73,6 +73,7 @@ while running:
                     running = False
 
             PF.display_cur_move(take_action)
+            PF.display_telemetry(GameBoard.telemetry)
 
             # Action handling
             if len(take_action) > 1:
@@ -135,6 +136,7 @@ while running:
             # Select the destination coordinates
             move_coord = rd.choice(possible_move_coords)
             print(f"choosing to go with {action} at {move_coord}")
+            GameBoard.telemetry = f"choosing to go with {action} at {move_coord}" # reset telemetry and add AI move
 
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)

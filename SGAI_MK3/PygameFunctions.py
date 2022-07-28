@@ -247,6 +247,12 @@ def display_cur_move(cur_move: List):
         ),
     )
 
+def display_telemetry(telemetry: List):
+    #display feedback
+    screen.blit(
+        font.render(telemetry, True, BLACK),
+        TELEMETRY_COORDS,
+    )
 
 def display_win_screen():
     screen.fill(BACKGROUND)
