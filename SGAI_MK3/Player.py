@@ -18,7 +18,7 @@ class Player:
         # Make a list of all possible actions that the computer can take
         possible_actions = [
             ACTION_SPACE[i]
-            for i in range(6)
+            for i in range(len(ACTION_SPACE))
             if (i != 5 and self.player_name == "Government")
             or (i != 4 and self.player_name == "Zombie")
         ]
