@@ -2,6 +2,7 @@ from Resources import Resources
 from State import State
 import random as rd
 from Person import Person
+from Wall import Wall
 from typing import List, Tuple
 from constants import *
 import random
@@ -35,6 +36,7 @@ class Board:
             "moveRight": self.moveRight,
             "heal": self.heal,
             "bite": self.bite,
+            "wall": self.wall,
         }
         self.resources = Resources(4)
 
@@ -60,11 +62,49 @@ class Board:
                 return True
         return False
 
+    def indexOf(self, isZombie: bool):
+        """
+        Returns the coordinates of the first occurrence of a
+        person whose isZombie == isZombie. On failure, returns (-1, -1)
+        """
+        for idx in range(len(self.States)):
+            state = self.States[idx]
+            if state.person is not None and state.person.isZombie == isZombie:
+                return idx
+        return -1
+
+    def is_move_possible_at(self, idx):
+        """
+        Returns whether a move is possible at the given idx.
+        """
+        copy = self.clone(self.States, self.player_role)
+        if self.States[idx].person is None:
+            return False
+
+        # try moves
+        start_coords = self.toCoord(idx)
+        for action in self.actionToFunction:
+            if "move" in action and copy.actionToFunction[action](start_coords)[0]:
+                return True
+
+        adjacents = self.getAdjacentCoords(start_coords)
+        for coord in adjacents:
+            # try biting if zombie
+            if copy.States[idx].person.isZombie:
+                if copy.bite(coord)[0]:
+                    return True
+            # try healing if person
+            else:
+                if copy.heal(coord)[0]:
+                    return True
+
+        return False
+
     def get_possible_moves(self, action: str, role: str):
         """
         Get the coordinates of people (or zombies) that are able
         to make the specified move.
-        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', and 'heal')
+        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', 'heal', and 'wall')
         @param role - either 'Zombie' or 'Government'; helps decide whether an action
         is valid and which people/zombies it applies to
         """
@@ -133,6 +173,7 @@ class Board:
                         changed_states = True
                     elif (
                         action != "heal"
+                        and action != "wall"
                         and not state.person.isZombie
                         and B.actionToFunction[action](B.toCoord(idx))[0]
                     ):
@@ -148,6 +189,14 @@ class Board:
                             for i in range(len(self.States))
                         ]
                         B.resources = self.resources.clone()
+
+                elif (
+                    action == "wall"
+                    and state.wall is None
+                    and B.isAdjacentTo(B.toCoord(state.location), False)
+                ):
+                    poss.append(B.toCoord(idx))
+
         return poss
 
     def toCoord(self, i: int):
@@ -174,14 +223,21 @@ class Board:
         NB.resources = self.resources.clone()
         return NB
 
-    def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
-        ret = False
+    def getAdjacentCoords(self, coord) -> List[Tuple[int, int]]:
         vals = [
             (coord[0], coord[1] + 1),
             (coord[0], coord[1] - 1),
             (coord[0] + 1, coord[1]),
             (coord[0] - 1, coord[1]),
         ]
+        for idx in range(len(vals) - 1, -1, -1):
+            if not self.isValidCoordinate(vals[idx]):
+                vals.pop(idx)
+        return vals
+
+    def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
+        ret = False
+        vals = self.getAdjacentCoords(coord)
         for coord in vals:
             if (
                 self.isValidCoordinate(coord)
@@ -211,7 +267,10 @@ class Board:
             return [False, destination_idx]
 
         # Check if the destination is currently occupied
-        if self.States[destination_idx].person is None:
+        if (
+            self.States[destination_idx].person is None
+            and self.States[destination_idx].wall is None
+        ):
             self.States[destination_idx].person = self.States[start_idx].person
             self.States[start_idx].person = None
             return [True, destination_idx]
@@ -234,6 +293,8 @@ class Board:
         return self.move(coords, new_coords)
 
     def bite(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        if not self.isValidCoordinate(coords):
+            return [False, None]
         i = self.toIndex(coords)
         if (
             self.States[i].person is None
@@ -265,7 +326,7 @@ class Board:
                     if rd.random() < chance:
                         p.get_cured()
                     else:
-                        print("Cure Failed")
+                        # print("Cure Failed")
                         return [False, None]
                 else:
                     return [False, None]
@@ -281,8 +342,29 @@ class Board:
                 return [False, i]
         return [True, i]
 
-    def populate(self):
-        total = rd.randint(7, ((self.rows * self.columns) / 3))
+    def wall(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        i = self.toIndex(coords)
+        if self.States[i].person is not None or not self.isValidCoordinate(coords):
+            return [False, None]
+        if self.isAdjacentTo(coords, False) and self.resources.spendOn("wall"):
+            w = Wall()
+            self.States[i].wall = w
+            return [True, i]
+        return [False, None]
+
+    def populate(self, num_people=-1, num_zombies=4):
+        """
+        Populate the board
+        @param num_people The number of people to make.
+        If set to -1 (default), makes a random number of people
+        between 7 and self.rows*self.columns/3. Note that the number of
+        people is the number of people BEFORE infection
+        @param num_zombies The number of zombies to make; defaults to 4
+        """
+        # make people
+        total = num_people
+        if total == -1:
+            total = rd.randint(7, ((self.rows * self.columns) / 3))
         poss = []
         for x in range(len(self.States)):
             r = rd.randint(0, 100)
@@ -293,8 +375,10 @@ class Board:
                 poss.append(x)
             else:
                 self.States[x].person = None
+
+        # make zombies
         used = []
-        for x in range(4):
+        for x in range(num_zombies):
             s = rd.randint(0, len(poss) - 1)
             while s in used:
                 s = rd.randint(0, len(poss) - 1)
@@ -314,18 +398,29 @@ class Board:
 
     def personAtIdx(self, idx: int):
         return self.States[idx].person
-    
+
     def get_board(self):
+        """
+        Returns an array from [0, 4]
+        4 means that the slot has a wall in it
+        3 means that the slot is empty but is a vax space
+        2 means that there is a zombie in the space
+        1 means that there is a person in the space
+        0 means that there is no one there
+        """
         s = []
         for i in range(len(self.States)):
-            if self.wall != None:
+            state = self.States[i]
+            if state.wall != None:
                 s.append(4)
-            elif self.States[i].person.isZombie:
-                s.append(2)
-            elif self.States[i].person.isZombie == False:
-                s.append(1)
+            if state.person is not None:
+                if state.person.isZombie:
+                    s.append(2)
+                else:
+                    s.append(1)
             else:
                 s.append(0)
         for i in self.getSafeEdge():
-            s[i] = 3
+            if s[i] == 0:
+                s[i] = 3
         return s

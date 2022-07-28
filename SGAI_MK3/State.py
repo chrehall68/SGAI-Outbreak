@@ -7,6 +7,7 @@ class State:
     def __init__(self, p: Person, i) -> None:
         self.person = p
         self.location = i
+        self.wall = None
         pass
 
     def distance(self, GameBoard, other_location: int):
@@ -27,6 +28,37 @@ class State:
                     if d < smallest_dist:
                         smallest_dist = d
         return smallest_dist
+
+    # returns the number of moves a person/zombie would have to take to get to another person/zombie
+    # "zombie" is for whether to look for the nearest zombie or person
+    def nearest_person(self, GameBoard, zombie: bool):
+        location = self.location
+        dRow = [-1, 0, 1, 0]
+        dCol = [0, 1, 0, -1]
+        visited = [False for i in range(36)]
+        toVisit = [[location, 0]] # current location, num moves to get there
+        visited[location] = True
+        while len(toVisit) > 0:
+            loc, moves = toVisit.pop(0)
+            visited[loc] = True
+            for i in range(4):
+                coords = list(GameBoard.toCoord(loc))
+                coords[0] += dRow[i]
+                coords[1] += dCol[i]
+                newLoc = GameBoard.toIndex(coords)
+                if GameBoard.isValidCoordinate(coords):
+                    if visited[newLoc] == False:
+                        visited[newLoc] = True
+                        if (GameBoard.States[newLoc].person != None
+                            and GameBoard.States[newLoc].person.isZombie == zombie
+                        ):
+                            return moves
+                        if (GameBoard.States[newLoc].wall == None
+                            and GameBoard.States[newLoc].person == None
+                        ):
+                            toVisit.append([newLoc, moves + 1])
+        # no possible path
+        return None
 
     def evaluate(self, action: str, GameBoard):
         reward = 0
@@ -66,7 +98,11 @@ class State:
         return moves
 
     def clone(self):
-        if self.person is None:
+        if self.wall is not None:
+            s = State(None, self.location)
+            s.wall = self.wall
+            return s
+        elif self.person is None:
             return State(self.person, self.location)
         return State(self.person.clone(), self.location)
 
@@ -82,6 +118,11 @@ class State:
         """
         If this has a person, update the person within.
         """
-        if self.person is None:
+        if self.wall is not None:
+            ret = self.wall.update()
+            if not ret:
+                self.wall = None
+            return
+        elif self.person is None:
             return
         self.person.update()

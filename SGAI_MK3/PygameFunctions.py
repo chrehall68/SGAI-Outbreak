@@ -100,6 +100,12 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= RESET_MOVE_COORDS[1]
         and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
     )
+    wall_check = (
+        pixel_x >= WALL_BUTTON_COORDS[0]
+        and pixel_x <= WALL_BUTTON_COORDS[0] + WALL_BUTTON_DIMS[0]
+        and pixel_y >= WALL_BUTTON_COORDS[1]
+        and pixel_y <= WALL_BUTTON_COORDS[1] + WALL_BUTTON_DIMS[1]
+    )
     board_x = int((pixel_x - MARGIN) / CELL_DIMENSIONS[0])
     board_y = int((pixel_y - MARGIN) / CELL_DIMENSIONS[1])
     move_check = (
@@ -115,6 +121,9 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return "bite"
     elif reset_move_check:
         return "reset move"
+    elif wall_check:
+        if GameBoard.player_role == "Government":
+            return "wall"
     elif move_check:
         return board_x, board_y
     return None
@@ -129,6 +138,7 @@ def run(GameBoard: Board):
     # Draw the heal icon
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
         display_resources(GameBoard.resources)
         display_safe_zone(GameBoard.safeEdge)
     else:
@@ -155,7 +165,7 @@ def display_resources(resources):
     )
     screen.blit(
         font.render(
-            f"cures cost {resources.costs['cure']}, vax costs {resources.costs['vaccinate']}",
+            f"cures cost {resources.costs['cure']}, vax costs {resources.costs['vaccinate']}, and walls cost {resources.costs['wall']}",
             True,
             WHITE,
         ),
@@ -213,6 +223,10 @@ def display_grid(GameBoard: Board):
                 image_path += IMAGE_ASSETS[0]
             board_like[idx].draw(
                 screen, bgcolor, image_path=image_path, image_size=PERSON_SIZE
+            )
+        elif GameBoard.States[idx].wall is not None:
+            board_like[idx].draw(
+                screen, bgcolor, image_path="Assets/wall.jpg", image_size=CELL_DIMENSIONS
             )
         else:
             # no person, so just draw the cell with the background color
@@ -281,3 +295,9 @@ def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
         return "moveRight"
     elif coord2[0] < coord1[0]:
         return "moveLeft"
+
+def display_wall(coords):
+    dims = (CELL_DIMENSIONS[0] - LINE_WIDTH, CELL_DIMENSIONS[1] - LINE_WIDTH)
+    new_coords = (coords[0] + LINE_WIDTH, coords[1] + LINE_WIDTH)
+    display_image(screen, "Assets/wall.jpg", dims, new_coords)
+
