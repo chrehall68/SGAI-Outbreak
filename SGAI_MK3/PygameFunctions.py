@@ -141,7 +141,7 @@ def run(GameBoard: Board):
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
         display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
         display_resources(GameBoard.resources)
-        display_safe_zone(GameBoard.safeEdge)
+        #display_safe_zone(GameBoard.safeEdge)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_reset_move_button()
