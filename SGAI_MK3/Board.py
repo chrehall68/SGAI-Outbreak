@@ -7,6 +7,12 @@ from typing import List, Tuple
 from constants import *
 import random
 
+#for recording down cures/vaccines
+actions_taken = {"movesMade" : 0, "curesGiven" : 0, "vaccinationsGiven" : 0, "wallsCreated" : 0}
+def record_actions(a , d):
+    d[a] += 1
+    print(d)
+
 
 class Board:
     def __init__(
@@ -42,7 +48,7 @@ class Board:
             "bite": self.bite,
             "wall": self.wall
         }
-        self.resources = Resources(4)
+        self.resources = Resources(4)      
 
     def getSafeEdge(self):
         return self.safeEdge
@@ -341,6 +347,7 @@ class Board:
             if self.isAdjacentTo(coords, False): # zombie only cured if adjacent
                 if self.resources.spendOn("cure"):
                     chance = 0.8 # 80% chance of getting cured (for now, # can be changed)
+                    record_actions("curesGiven", actions_taken)
                     if rd.random() < chance:
                         p.get_cured()
                     else:
@@ -352,6 +359,7 @@ class Board:
         else:
             if i in self.getSafeEdge():
                 if self.resources.spendOn("vaccinate"):
+                    record_actions("vaccinationsGiven", actions_taken)
                     p.get_vaccinated()
                 else:
                     return [False, i]
@@ -366,6 +374,7 @@ class Board:
         if self.isAdjacentTo(coords, False) and self.resources.spendOn("wall"):
             w = Wall()
             self.States[i].wall = w
+            record_actions("wallsCreated", actions_taken)
             return [True, i]
         return [False, None]
 
