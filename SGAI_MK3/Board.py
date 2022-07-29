@@ -326,8 +326,7 @@ class Board:
                     if rd.random() < chance:
                         p.get_cured()
                     else:
-                        # print("Cure Failed")
-                        return [False, None]
+                        print("Cure Failed")
                 else:
                     return [False, None]
             else:
