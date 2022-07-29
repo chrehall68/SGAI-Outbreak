@@ -4,6 +4,9 @@ from Player import GovernmentPlayer, ZombiePlayer
 import PygameFunctions as PF
 import random as rd
 from constants import *
+from Board import actions_taken
+from Resources import Resources
+
 
 SELF_PLAY = True  # whether or not a human will be playing
 player_role = "Government"  # Valid options are "Government" and "Zombie"
@@ -43,6 +46,7 @@ while running:
     if SELF_PLAY:
         if not playerMoved:
             if not GameBoard.containsPerson(False):
+                PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 PF.display_lose_screen()
                 running = False
                 continue
@@ -91,6 +95,7 @@ while running:
                         )
                         if result[0] is not False:
                             playerMoved = True
+                            PF.record_actions("movesMade", actions_taken)
                         take_action = []
 
                 elif take_action[0] == "heal" or take_action[0] == "bite":
@@ -117,12 +122,14 @@ while running:
             action, move_coord = enemy_player.get_move(GameBoard)
 
             if not action:
+                PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 running = False
                 PF.display_win_screen()
                 continue
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
-            # update the board's states
+
+            # Update the board's states
             GameBoard.update()
 
         # Update the display
