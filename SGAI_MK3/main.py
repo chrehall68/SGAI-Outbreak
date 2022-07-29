@@ -1,6 +1,6 @@
 import pygame
 from Board import Board
-from Player import GovernmentPlayer, ZombiePlayer
+from Player import *
 import PygameFunctions as PF
 import random as rd
 from constants import *
@@ -8,7 +8,7 @@ from Board import actions_taken
 from Resources import Resources
 
 
-SELF_PLAY = True  # whether or not a human will be playing
+SELF_PLAY = False  # whether or not a human will be playing
 player_role = "Government"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
@@ -33,19 +33,21 @@ playerMoved = False
 
 enemy_player = None
 if player_role == "Government":
-    enemy_player = ZombiePlayer()
+    enemy_player = ZombieMinimaxPlayer()
+    ai_player = GovernmentMinimaxPlayer()
 else:
-    enemy_player = GovernmentPlayer()
+    enemy_player = GovernmentMinimaxPlayer()
+    ai_player = ZombieMinimaxPlayer()
 
-if SELF_PLAY:
-    PF.initScreen(GameBoard)
+PF.initScreen(GameBoard)
+
 
 while running:
     P = PF.run(GameBoard)
 
-    if SELF_PLAY:
-        if not playerMoved:
-            if not GameBoard.containsPerson(False):
+    if not playerMoved:
+        if SELF_PLAY:
+            if not GovernmentPlayer().get_move(GameBoard)[0]:
                 PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 PF.display_lose_screen()
                 running = False
@@ -114,27 +116,37 @@ while running:
                         playerMoved = True
                     take_action = []
 
-        # Computer turn
+        # ai player as player 1
         else:
-            playerMoved = False
-            take_action = []
-
-            action, move_coord = enemy_player.get_move(GameBoard)
-
+            action, move_coord = ai_player.get_move(GameBoard)
             if not action:
                 PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 running = False
-                PF.display_win_screen()
+                PF.display_lose_screen()
                 continue
-            # Implement the selected action
+
+            print("action was", action)
             GameBoard.actionToFunction[action](move_coord)
+            playerMoved = True
+            continue
 
-            # Update the board's states
-            GameBoard.update()
-
-        # Update the display
-        pygame.display.update()
-        pygame.time.wait(75)
-
+    # Computer turn
     else:
-        pass  # TODO
+        playerMoved = False
+        take_action = []
+        action, move_coord = enemy_player.get_move(GameBoard)
+
+        if not action:
+            PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
+            running = False
+            PF.display_win_screen()
+            continue
+
+        # Implement the selected action
+        GameBoard.actionToFunction[action](move_coord)
+        # Update the board's states
+        GameBoard.update()
+
+    # Update the display
+    pygame.display.update()
+    pygame.time.wait(75)
