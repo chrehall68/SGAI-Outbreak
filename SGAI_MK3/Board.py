@@ -43,7 +43,7 @@ class Board:
             "wall": self.wall
         }
         self.resources = Resources(4)
-        self.telemetry = "TEST"
+        self.telemetry = "Your Move"
 
     def getSafeEdge(self):
         return self.safeEdge
