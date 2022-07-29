@@ -2,6 +2,8 @@ from typing import List, Tuple
 import pygame
 from constants import *
 from Board import Board
+from Person import Person
+from Wall import Wall
 
 # globals
 screen = None
@@ -19,7 +21,7 @@ def initScreen(board: Board):
     heading_font = pygame.font.SysFont("Helvetica", 45)
     screen.fill(BACKGROUND)
     board_like = [
-        Cell((LEFT_MARGIN + x * CELL_DIMENSIONS[0], TOP_MARGIN + y * CELL_DIMENSIONS[1]))
+        Cell((MARGIN + x * CELL_DIMENSIONS[0], MARGIN + y * CELL_DIMENSIONS[1]))
         for y in range(board.rows)
         for x in range(board.columns)
     ]
@@ -107,8 +109,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= WALL_BUTTON_COORDS[1]
         and pixel_y <= WALL_BUTTON_COORDS[1] + WALL_BUTTON_DIMS[1]
     )
-    board_x = int((pixel_x - LEFT_MARGIN) / CELL_DIMENSIONS[0])
-    board_y = int((pixel_y - TOP_MARGIN) / CELL_DIMENSIONS[1])
+    board_x = int((pixel_x - MARGIN) / CELL_DIMENSIONS[0])
+    board_y = int((pixel_y - MARGIN) / CELL_DIMENSIONS[1])
     move_check = (
         board_x >= 0
         and board_x < GameBoard.columns
@@ -141,6 +143,7 @@ def run(GameBoard: Board):
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
         display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
         display_resources(GameBoard.resources)
+        #display_turns_left(Person.vaxTurnsLeft(), Wall.wallTurnsLeft())
         #display_safe_zone(GameBoard.safeEdge)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
@@ -167,29 +170,18 @@ def display_resources(resources):
     )
     display_image(screen, "Assets/coin.png", COIN_DIMS, COIN_BALANCE_COORDS)
 
-    costs = [["cure:", f"{resources.costs['cure']}"],
-            [f"vax:", f"{resources.costs['vaccinate']}"],
-            [f"walls:", f"{resources.costs['wall']}" ]]
-    
-    for index in range(3):
+    costs = [f"a cure costs {resources.costs['cure']}",
+            f"a vax costs {resources.costs['vaccinate']}",
+            f"a walls cost {resources.costs['wall']}" ]
+    for index in range(len(costs)):
         screen.blit(
-            heading_font.render(
-                costs[index][0],
+            font.render(
+                costs[index],
                 True,
                 WHITE,
             ),
-            (925, 250 + 50*index),
+            (800, 250 + 50*index),
         )
-        screen.blit(
-            heading_font.render(
-                costs[index][1],
-                True,
-                WHITE,
-            ),
-            (1050, 250 + 50*index),
-        )
-        display_image(screen, "Assets/coin.png", (40, 40), (1080, 255 + 50 * index))
-
 
 
 def display_safe_zone(zone):
@@ -271,7 +263,7 @@ def display_cur_move(cur_move: List):
 def display_telemetry(telemetry: List):
     #display feedback
     screen.blit(
-        font.render(telemetry, True, TELEMETRY_RED),
+        font.render(telemetry, True, BLACK),
         TELEMETRY_COORDS,
     )
 
@@ -312,6 +304,14 @@ def display_lose_screen():
             if event.type == pygame.QUIT:
                 return
 
+def display_turns_left(vax, wall):
+    print(vax,wall)
+    turnsLeft = [f"Turns left on vaccination : {vax}", f"Turns left on wall : {wall}"]
+    for index in turnsLeft:
+        screen.blit(
+            font.render(turnsLeft[index], True, BLACK), (800,300+50*index),
+        )
+    pygame.display.update()
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
     if coord2[1] > coord1[1]:
