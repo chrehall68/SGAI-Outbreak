@@ -1,9 +1,12 @@
+from asyncio import constants
 from typing import List, Tuple
 import pygame
 from constants import *
 from Board import Board
 from Person import Person
 from Wall import Wall
+import csv
+
 
 # globals
 screen = None
@@ -332,4 +335,27 @@ def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
         return "moveRight"
     elif coord2[0] < coord1[0]:
         return "moveLeft"
+
+    
+def record_actions(a , d):
+    d[a] += 1
+
+
+def csv_update(file_name, costs, moves):
+
+    header = ["cure", "vaccinate", "wall", "movesMade","curesGiven","vaccinationsGiven","wallsCreated"]
+
+    costs.update(moves)
+    data = costs
+
+
+    with open(file_name, 'a', newline = '') as f:
+        w = csv.DictWriter(f, header)
+
+        if f.tell() == 0:
+            w.writeheader()
+        
+        w.writerow(data)
+
+
 

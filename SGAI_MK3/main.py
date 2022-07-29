@@ -3,6 +3,9 @@ from Board import Board
 import PygameFunctions as PF
 import random as rd
 from constants import *
+from Board import actions_taken
+from Resources import Resources
+
 
 SELF_PLAY = True  # whether or not a human will be playing
 player_role = "Government"  # Valid options are "Government" and "Zombie"
@@ -27,6 +30,8 @@ running = True
 take_action = []
 playerMoved = False
 
+
+
 if SELF_PLAY:
     PF.initScreen(GameBoard)
 
@@ -36,6 +41,7 @@ while running:
     if SELF_PLAY:
         if not playerMoved:
             if not GameBoard.containsPerson(False):
+                PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 PF.display_lose_screen()
                 running = False
                 continue
@@ -85,6 +91,7 @@ while running:
                         )
                         if result[0] is not False:
                             playerMoved = True
+                            PF.record_actions("movesMade", actions_taken)
                         take_action = []
 
                 elif take_action[0] == "heal" or take_action[0] == "bite":
@@ -129,6 +136,7 @@ while running:
                     print(
                         f"The price of vaccination was {GameBoard.resources.costs['vaccinate']}, the price of curing was {GameBoard.resources.costs['cure']}, and the price of walls was {GameBoard.reources.costs['wall']}"
                     )
+                PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 PF.display_win_screen()
                 running = False
                 continue
@@ -140,7 +148,9 @@ while running:
 
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
-            # update the board's states
+    
+    
+            # Update the board's states
             GameBoard.update()
 
         # Update the display
@@ -199,7 +209,6 @@ while running:
             # GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
             if GameBoard.num_zombies() == 0:
                 print("winCase")
-
             take_action = []
             print("Enemy turn")
             ta = ""

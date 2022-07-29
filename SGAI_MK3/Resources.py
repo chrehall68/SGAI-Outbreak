@@ -25,5 +25,8 @@ class Resources:
         self.resources += num_people * Resources.accumulationPerPerson
         self.resources += Resources.accumulationPerTurn
 
+    def getCosts(self):
+        return self.costs
+
     def clone(self):
         return Resources(self.resources)
