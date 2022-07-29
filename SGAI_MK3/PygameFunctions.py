@@ -302,7 +302,6 @@ def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
     
 def record_actions(a , d):
     d[a] += 1
-    print(d)
 
 
 def csv_update(file_name, costs, moves):
