@@ -21,7 +21,7 @@ def initScreen(board: Board):
     heading_font = pygame.font.SysFont("Helvetica", 45)
     screen.fill(BACKGROUND)
     board_like = [
-        Cell((MARGIN + x * CELL_DIMENSIONS[0], MARGIN + y * CELL_DIMENSIONS[1]))
+        Cell((LEFT_MARGIN + x * CELL_DIMENSIONS[0], TOP_MARGIN + y * CELL_DIMENSIONS[1]))
         for y in range(board.rows)
         for x in range(board.columns)
     ]
@@ -109,8 +109,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= WALL_BUTTON_COORDS[1]
         and pixel_y <= WALL_BUTTON_COORDS[1] + WALL_BUTTON_DIMS[1]
     )
-    board_x = int((pixel_x - MARGIN) / CELL_DIMENSIONS[0])
-    board_y = int((pixel_y - MARGIN) / CELL_DIMENSIONS[1])
+    board_x = int((pixel_x - LEFT_MARGIN) / CELL_DIMENSIONS[0])
+    board_y = int((pixel_y - TOP_MARGIN) / CELL_DIMENSIONS[1])
     move_check = (
         board_x >= 0
         and board_x < GameBoard.columns
@@ -170,18 +170,28 @@ def display_resources(resources):
     )
     display_image(screen, "Assets/coin.png", COIN_DIMS, COIN_BALANCE_COORDS)
 
-    costs = [f"a cure costs {resources.costs['cure']}",
-            f"a vax costs {resources.costs['vaccinate']}",
-            f"a walls cost {resources.costs['wall']}" ]
-    for index in range(len(costs)):
+    costs = [["cure:", f"{resources.costs['cure']}"],
+            [f"vax:", f"{resources.costs['vaccinate']}"],
+            [f"walls:", f"{resources.costs['wall']}" ]]
+    for index in range(3):
         screen.blit(
-            font.render(
-                costs[index],
+            heading_font.render(
+                costs[index][0],
                 True,
                 WHITE,
             ),
-            (800, 250 + 50*index),
+            (925, 250 + 50*index),
         )
+        screen.blit(
+            heading_font.render(
+                costs[index][1],
+                True,
+                WHITE,
+            ),
+            (1050, 250 + 50*index),
+        )
+        display_image(screen, "Assets/coin.png", (40, 40), (1080, 255 + 50 * index))
+
 
 
 def display_safe_zone(zone):
@@ -263,7 +273,7 @@ def display_cur_move(cur_move: List):
 def display_telemetry(telemetry: List):
     #display feedback
     screen.blit(
-        font.render(telemetry, True, BLACK),
+        font.render(telemetry, True, TELEMETRY_RED),
         TELEMETRY_COORDS,
     )
 
