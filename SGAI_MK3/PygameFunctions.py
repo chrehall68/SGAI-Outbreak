@@ -10,12 +10,13 @@ board_like = []
 
 
 def initScreen(board: Board):
-    global font, screen, board_like
+    global font, heading_font, screen, board_like
     # Initialize pygame
     screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
     pygame.display.set_caption("Outbreak!")
     pygame.font.init()
     font = pygame.font.SysFont("Comic Sans", 20)
+    heading_font = pygame.font.SysFont("Helvetica", 45)
     screen.fill(BACKGROUND)
     board_like = [
         Cell((MARGIN + x * CELL_DIMENSIONS[0], MARGIN + y * CELL_DIMENSIONS[1]))
@@ -139,7 +140,6 @@ def run(GameBoard: Board):
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
         display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
-        display_image(screen, "Assets/coin.png", COIN_DIMS, COIN_BALANCE_COORDS)
         display_resources(GameBoard.resources)
         display_safe_zone(GameBoard.safeEdge)
     else:
@@ -160,18 +160,25 @@ def display_reset_move_button():
 
 
 def display_resources(resources):
+    resource_coords = (1115 - 20 * len(str(resources.resources)), 25) # adjusts position based on # of digits
     screen.blit(
-        font.render(f"You have {resources.resources} resources", True, WHITE),
-        (800, 700),
+        heading_font.render(f"{resources.resources}", True, WHITE),
+        resource_coords,
     )
-    screen.blit(
-        font.render(
-            f"cures cost {resources.costs['cure']}, vax costs {resources.costs['vaccinate']}, and walls cost {resources.costs['wall']}",
-            True,
-            WHITE,
-        ),
-        (800, 750),
-    )
+    display_image(screen, "Assets/coin.png", COIN_DIMS, COIN_BALANCE_COORDS)
+
+    costs = [f"a cure costs {resources.costs['cure']}",
+            f"a vax costs {resources.costs['vaccinate']}",
+            f"a walls cost {resources.costs['wall']}" ]
+    for index in range(len(costs)):
+        screen.blit(
+            font.render(
+                costs[index],
+                True,
+                WHITE,
+            ),
+            (800, 250 + 50*index),
+        )
 
 
 def display_safe_zone(zone):
