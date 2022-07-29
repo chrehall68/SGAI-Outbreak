@@ -136,7 +136,7 @@ while running:
             # Select the destination coordinates
             move_coord = rd.choice(possible_move_coords)
             print(f"choosing to go with {action} at {move_coord}")
-            GameBoard.telemetry = f"choosing to go with {action} at {move_coord}" # reset telemetry and add AI move
+            GameBoard.telemetry = f"the AI chose to {action}" # reset telemetry and add AI move
 
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
