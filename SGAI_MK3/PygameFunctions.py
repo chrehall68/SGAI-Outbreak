@@ -139,6 +139,7 @@ def run(GameBoard: Board):
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
         display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
+        display_image(screen, "Assets/coin.png", COIN_DIMS, COIN_BALANCE_COORDS)
         display_resources(GameBoard.resources)
         display_safe_zone(GameBoard.safeEdge)
     else:

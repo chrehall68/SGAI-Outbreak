@@ -32,6 +32,9 @@ MARGIN = 150  # Number of pixels to offset grid to the top-left side
 WALL_BUTTON_DIMS = (200, 50)
 WALL_BUTTON_COORDS = (800, 525)
 
+COIN_DIMS = (50, 50)
+COIN_BALANCE_COORDS = (1125, 25)
+
 MIN_WALL_DURATION = 1
 MAX_WALL_DURATION = 3
 
