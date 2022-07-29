@@ -352,7 +352,6 @@ class Board:
                         p.get_cured()
                     else:
                         print("Cure Failed")
-                        return [False, None]
                 else:
                     return [False, None]
             else:
