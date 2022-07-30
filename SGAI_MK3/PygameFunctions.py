@@ -141,9 +141,18 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     display_grid(GameBoard)  # Draw the grid and the people
+    screen.blit( # name/action
+            heading_font.render(
+                "role: " + GameBoard.player_role,
+                True,
+                WHITE,
+            ),
+            (40, 25),
+        )
     # Draw the heal icon
     if GameBoard.player_role == "Government":
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_image(screen, "Assets/vax.png", VAX_DIMS, VAX_COORDS)
         display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
         display_resources(GameBoard.resources)
         #display_turns_left(Person.vaxTurnsLeft(), Wall.wallTurnsLeft())
@@ -177,7 +186,7 @@ def display_resources(resources):
             [f"vax:", f"{resources.costs['vaccinate']}"],
             [f"walls:", f"{resources.costs['wall']}" ]]
     for index in range(3):
-        screen.blit(
+        screen.blit( # name/action
             heading_font.render(
                 costs[index][0],
                 True,
@@ -185,7 +194,7 @@ def display_resources(resources):
             ),
             (925, 250 + 50*index),
         )
-        screen.blit(
+        screen.blit( # price
             heading_font.render(
                 costs[index][1],
                 True,
@@ -193,6 +202,7 @@ def display_resources(resources):
             ),
             (1050, 250 + 50*index),
         )
+        # coin img
         display_image(screen, "Assets/coin.png", (40, 40), (1080, 255 + 50 * index))
 
 
