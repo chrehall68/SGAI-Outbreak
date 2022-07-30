@@ -1,7 +1,15 @@
 # pycache files
 *.pyc
+*.idea
 
 # tensorboard files
 *.v2  
 SGAI_MK3/checkpoint
+<<<<<<< HEAD
 tflogv2/
+=======
+SGAI_MK3/saved_zombie_models/*
+tflogv2/
+*.index
+*.data-00000-of-00001
+>>>>>>> e73ca8154c18f2468a793de5606ea50274423459
