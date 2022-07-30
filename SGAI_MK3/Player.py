@@ -5,6 +5,8 @@ import numpy as np
 from Board import Board
 from constants import *
 import random as rd
+import math
+
 
 
 class Player:
@@ -109,7 +111,18 @@ class ZombieAIPlayer(ZombiePlayer):
         super().__init__()
 
     def get_move(self, board: Board) -> Tuple[str, Tuple[int, int]]:
-        raise NotImplementedError("TODO")
+        best_action = None
+        best_value = -math.inf
+        best_pos = None
+        for i in range(36):
+            if board.States[i].person.isZombie:
+                action, pos, value = board.States[i].person.get_best_move(board, i)
+                if value > best_value:
+                    best_action = action
+                    best_value = value
+                    best_pos = pos
+        return best_action, best_pos
+
 
 
 class MiniMaxPlayer(Player):
