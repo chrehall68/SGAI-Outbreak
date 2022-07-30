@@ -1,5 +1,6 @@
 # pycache files
 *.pyc
+*.idea
 
 # tensorboard files
 *.v2  
