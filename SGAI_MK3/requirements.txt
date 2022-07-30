@@ -1,0 +1,8 @@
+keras==2.9.0
+numpy==1.23.1
+pygame==2.1.2
+stable_baselines3==1.6.0
+tensorflow==2.9.1
+tensorflow_macos==2.9.2
+torch==1.13.0.dev20220725
+tqdm==4.64.0
