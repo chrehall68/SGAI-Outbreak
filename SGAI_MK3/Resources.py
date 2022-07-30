@@ -4,7 +4,7 @@ import random as rd
 class Resources:
     # static variable since this should be easily accessible and changeable
     accumulationPerPerson = 1
-    accumulationPerTurn = 0
+    accumulationPerTurn = 2
 
     def __init__(self, starting_resources: int):
         self.resources = starting_resources

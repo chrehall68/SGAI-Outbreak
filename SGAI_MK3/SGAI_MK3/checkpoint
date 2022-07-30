@@ -1,0 +1,2 @@
+model_checkpoint_path: "gov_policy_weights"
+all_model_checkpoint_paths: "gov_policy_weights"

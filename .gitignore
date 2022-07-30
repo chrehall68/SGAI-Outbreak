@@ -1,1 +1,8 @@
+# pycache files
 *.pyc
+*.idea
+
+# tensorboard files
+*.v2  
+SGAI_MK3/checkpoint
+tflogv2/
