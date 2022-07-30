@@ -8,7 +8,7 @@ from Board import actions_taken
 from Resources import Resources
 
 
-SELF_PLAY = False  # whether or not a human will be playing
+SELF_PLAY = True  # whether or not a human will be playing
 player_role = "Government"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)

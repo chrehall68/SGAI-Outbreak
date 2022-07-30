@@ -18,7 +18,7 @@ actions_taken = {
 
 def record_actions(a, d):
     d[a] += 1
-    print(d)
+    # print(d)
 
 
 class Board:
@@ -341,7 +341,8 @@ class Board:
                     if rd.random() < chance:
                         p.get_cured()
                     else:
-                        print("Cure Failed")
+                        # print("Cure Failed")
+                        pass
                 else:
                     return [False, None]
             else:
