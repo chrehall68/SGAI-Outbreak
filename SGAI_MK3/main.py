@@ -2,10 +2,8 @@ import pygame
 from Board import Board
 from Player import *
 import PygameFunctions as PF
-import random as rd
 from constants import *
 from Board import actions_taken
-from Resources import Resources
 
 
 SELF_PLAY = True  # whether or not a human will be playing
@@ -13,18 +11,6 @@ player_role = "Government"  # Valid options are "Government" and "Zombie"
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), player_role)
 GameBoard.populate()
-
-# Self play variables
-alpha = 0.1
-gamma = 0.6
-epsilon = 0.1
-epochs = 1000
-epochs_ran = 0
-Original_Board = GameBoard.clone(GameBoard.States, GameBoard.player_role)
-
-# Temp
-print(GameBoard.getSafeEdge())
-
 
 # Initialize variables
 running = True
@@ -35,9 +21,11 @@ enemy_player = None
 if player_role == "Government":
     enemy_player = ZombieMinimaxPlayer()
     ai_player = GovernmentMinimaxPlayer()
+    dummy_player = GovernmentPlayer()
 else:
     enemy_player = GovernmentMinimaxPlayer()
     ai_player = ZombieMinimaxPlayer()
+    dummy_player = ZombiePlayer()
 
 PF.initScreen(GameBoard)
 
@@ -47,7 +35,7 @@ while running:
 
     if not playerMoved:
         if SELF_PLAY:
-            if not GovernmentPlayer().get_move(GameBoard)[0]:
+            if not dummy_player.get_move(GameBoard)[0]:
                 PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 PF.display_lose_screen()
                 running = False
@@ -57,8 +45,13 @@ while running:
                 if event.type == pygame.MOUSEBUTTONUP:
                     x, y = pygame.mouse.get_pos()
                     action = PF.get_action(GameBoard, x, y)
-                    if action == "heal" or action == "bite" or action == "wall":
-                        # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
+                    if (
+                        action == "cure"
+                        or action == "vaccinate"
+                        or action == "wall"
+                        or action == "bite"
+                    ):
+                        # only allow healing by itself (prevents things like ['move', (4, 1), 'cure'])
                         if len(take_action) == 0:
                             take_action.append(action)
                     elif action == "reset move":
@@ -101,14 +94,9 @@ while running:
                             PF.record_actions("movesMade", actions_taken)
                         take_action = []
 
-                elif take_action[0] == "heal" or take_action[0] == "bite":
-                    result = GameBoard.actionToFunction[take_action[0]](take_action[1])
-                    if result[0] is not False:
-                        playerMoved = True
-                    take_action = []
-
                 elif (
-                    take_action[0] == "heal"
+                    take_action[0] == "cure"
+                    or take_action[0] == "vaccinate"
                     or take_action[0] == "bite"
                     or take_action[0] == "wall"
                 ):
@@ -127,9 +115,10 @@ while running:
                 continue
 
             # Select the destination coordinates
-            move_coord = rd.choice(possible_move_coords)
             print(f"choosing to go with {action} at {move_coord}")
-            GameBoard.telemetry = f"the AI chose to {action}" # reset telemetry and add AI move
+            GameBoard.telemetry = (
+                f"the AI chose to {action}"  # reset telemetry and add AI move
+            )
 
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
@@ -148,6 +137,7 @@ while running:
             PF.display_win_screen()
             continue
 
+        print(f"choosing to go with {action} at {move_coord}")
         # Implement the selected action
         GameBoard.actionToFunction[action](move_coord)
         # Update the board's states
