@@ -52,6 +52,7 @@ class Board:
             "wall": self.wall,
         }
         self.resources = Resources(4)
+        self.telemetry = "Your Move"
 
     def getSafeEdge(self):
         return self.safeEdge
@@ -341,7 +342,8 @@ class Board:
                     if rd.random() < chance:
                         p.get_cured()
                     else:
-                        # print("Cure Failed")
+                        print("Cure Failed")
+                        self.telemetry = "Cure Failed!"
                         pass
                 else:
                     return [False, None]

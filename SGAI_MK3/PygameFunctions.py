@@ -3,6 +3,8 @@ from typing import List, Tuple
 import pygame
 from constants import *
 from Board import Board
+from Person import Person
+from Wall import Wall
 import csv
 
 
@@ -13,15 +15,16 @@ board_like = []
 
 
 def initScreen(board: Board):
-    global font, screen, board_like
+    global font, heading_font, screen, board_like
     # Initialize pygame
     screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
     pygame.display.set_caption("Outbreak!")
     pygame.font.init()
     font = pygame.font.SysFont("Comic Sans", 20)
+    heading_font = pygame.font.SysFont("Helvetica", 45)
     screen.fill(BACKGROUND)
     board_like = [
-        Cell((MARGIN + x * CELL_DIMENSIONS[0], MARGIN + y * CELL_DIMENSIONS[1]))
+        Cell((LEFT_MARGIN + x * CELL_DIMENSIONS[0], TOP_MARGIN + y * CELL_DIMENSIONS[1]))
         for y in range(board.rows)
         for x in range(board.columns)
     ]
@@ -109,8 +112,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= WALL_BUTTON_COORDS[1]
         and pixel_y <= WALL_BUTTON_COORDS[1] + WALL_BUTTON_DIMS[1]
     )
-    board_x = int((pixel_x - MARGIN) / CELL_DIMENSIONS[0])
-    board_y = int((pixel_y - MARGIN) / CELL_DIMENSIONS[1])
+    board_x = int((pixel_x - LEFT_MARGIN) / CELL_DIMENSIONS[0])
+    board_y = int((pixel_y - TOP_MARGIN) / CELL_DIMENSIONS[1])
     move_check = (
         board_x >= 0
         and board_x < GameBoard.columns
@@ -138,15 +141,15 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     display_grid(GameBoard)  # Draw the grid and the people
-    # Draw the heal icon
-    if GameBoard.player_role == "Government":
-        display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
-        display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
-        display_resources(GameBoard.resources)
-        display_safe_zone(GameBoard.safeEdge)
-    else:
-        display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
-    display_reset_move_button()
+    screen.blit( # name/action
+            heading_font.render(
+                "role: " + GameBoard.player_role,
+                True,
+                WHITE,
+            ),
+            (40, 25),
+        )
+    display_options(GameBoard)
     return pygame.event.get()
 
 
@@ -160,20 +163,60 @@ def display_reset_move_button():
     pygame.draw.rect(screen, BLACK, rect)
     screen.blit(font.render("Reset move?", True, WHITE), RESET_MOVE_COORDS)
 
+def display_options(GameBoard):
+    # Draw the options and highlight
+    print(GameBoard.resources.getCosts())
+    if GameBoard.player_role == "Government":
+        options = { "cure": [CURE_BITE_COORDS, CURE_BITE_DIMS],
+                    "vaccinate": [VAX_COORDS, VAX_DIMS],
+                    "wall": [WALL_BUTTON_COORDS, WALL_BUTTON_DIMS]}
+        for option in options:
+            if GameBoard.resources.resources < GameBoard.resources.costs[option]:
+                coordsdims = options[option] # list w/ [coords tuple, dims tuple]
+                pygame.draw.rect(screen, IMG_RED, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
+            else: #elif the move is selected: #** need to work on in separate branch
+                pygame.draw.rect(screen, IMG_GREEN, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
+        display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_image(screen, "Assets/vax.png", VAX_DIMS, VAX_COORDS)
+        display_image(screen, "Assets/wall.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
+        display_resources(GameBoard.resources)
+        #display_turns_left(Person.vaxTurnsLeft(), Wall.wallTurnsLeft())
+        #display_safe_zone(GameBoard.safeEdge)
+    else:
+        display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
+    display_reset_move_button()
 
 def display_resources(resources):
+    resource_coords = (1115 - 20 * len(str(resources.resources)), 25) # adjusts position based on # of digits
     screen.blit(
-        font.render(f"You have {resources.resources} resources", True, WHITE),
-        (800, 700),
+        heading_font.render(f"{resources.resources}", True, WHITE),
+        resource_coords,
     )
-    screen.blit(
-        font.render(
-            f"cures cost {resources.costs['cure']}, vax costs {resources.costs['vaccinate']}, and walls cost {resources.costs['wall']}",
-            True,
-            WHITE,
-        ),
-        (800, 750),
-    )
+    display_image(screen, "Assets/coin.png", COIN_DIMS, COIN_BALANCE_COORDS)
+
+    costs = [["cure:", f"{resources.costs['cure']}"],
+            [f"vax:", f"{resources.costs['vaccinate']}"],
+            [f"walls:", f"{resources.costs['wall']}" ]]
+    for index in range(3):
+        screen.blit( # name/action
+            heading_font.render(
+                costs[index][0],
+                True,
+                WHITE,
+            ),
+            (925, 250 + 50*index),
+        )
+        screen.blit( # price
+            heading_font.render(
+                costs[index][1],
+                True,
+                WHITE,
+            ),
+            (1050, 250 + 50*index),
+        )
+        # coin img
+        display_image(screen, "Assets/coin.png", (40, 40), (1080, 255 + 50 * index))
+
 
 
 def display_safe_zone(zone):
@@ -214,6 +257,8 @@ def display_grid(GameBoard: Board):
         bgcolor = BACKGROUND
         if idx in GameBoard.getSafeEdge():
             bgcolor = VAX_COLOR
+        else:
+            bgcolor = CELL_COLOR
         person = GameBoard.personAtIdx(idx)
         if person is not None:
             # there is a person, so draw the person
@@ -229,7 +274,7 @@ def display_grid(GameBoard: Board):
             )
         elif GameBoard.States[idx].wall is not None:
             board_like[idx].draw(
-                screen, bgcolor, image_path="Assets/wall.jpg", image_size=CELL_DIMENSIONS
+                screen, bgcolor, image_path="Assets/wall.png", image_size=CELL_DIMENSIONS
             )
         else:
             # no person, so just draw the cell with the background color
@@ -250,6 +295,12 @@ def display_cur_move(cur_move: List):
         ),
     )
 
+def display_telemetry(telemetry: List):
+    #display feedback
+    screen.blit(
+        font.render(telemetry, True, TELEMETRY_RED),
+        TELEMETRY_COORDS,
+    )
 
 def display_win_screen():
     screen.fill(BACKGROUND)
@@ -288,6 +339,14 @@ def display_lose_screen():
             if event.type == pygame.QUIT:
                 return
 
+def display_turns_left(vax, wall):
+    print(vax,wall)
+    turnsLeft = [f"Turns left on vaccination : {vax}", f"Turns left on wall : {wall}"]
+    for index in turnsLeft:
+        screen.blit(
+            font.render(turnsLeft[index], True, BLACK), (800,300+50*index),
+        )
+    pygame.display.update()
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
     if coord2[1] > coord1[1]:
