@@ -149,17 +149,7 @@ def run(GameBoard: Board):
             ),
             (40, 25),
         )
-    # Draw the heal icon
-    if GameBoard.player_role == "Government":
-        display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
-        display_image(screen, "Assets/vax.png", VAX_DIMS, VAX_COORDS)
-        display_image(screen, "Assets/wall_button.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
-        display_resources(GameBoard.resources)
-        #display_turns_left(Person.vaxTurnsLeft(), Wall.wallTurnsLeft())
-        #display_safe_zone(GameBoard.safeEdge)
-    else:
-        display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
-    display_reset_move_button()
+    display_options(GameBoard)
     return pygame.event.get()
 
 
@@ -173,6 +163,28 @@ def display_reset_move_button():
     pygame.draw.rect(screen, BLACK, rect)
     screen.blit(font.render("Reset move?", True, WHITE), RESET_MOVE_COORDS)
 
+def display_options(GameBoard):
+    # Draw the options and highlight
+    print(GameBoard.resources.getCosts())
+    if GameBoard.player_role == "Government":
+        options = { "cure": [CURE_BITE_COORDS, CURE_BITE_DIMS],
+                    "vaccinate": [VAX_COORDS, VAX_DIMS],
+                    "wall": [WALL_BUTTON_COORDS, WALL_BUTTON_DIMS]}
+        for option in options:
+            if GameBoard.resources.resources < GameBoard.resources.costs[option]:
+                coordsdims = options[option] # list w/ [coords tuple, dims tuple]
+                pygame.draw.rect(screen, IMG_RED, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
+            else: #elif the move is selected: #** need to work on in separate branch
+                pygame.draw.rect(screen, IMG_GREEN, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
+        display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
+        display_image(screen, "Assets/vax.png", VAX_DIMS, VAX_COORDS)
+        display_image(screen, "Assets/wall.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
+        display_resources(GameBoard.resources)
+        #display_turns_left(Person.vaxTurnsLeft(), Wall.wallTurnsLeft())
+        #display_safe_zone(GameBoard.safeEdge)
+    else:
+        display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
+    display_reset_move_button()
 
 def display_resources(resources):
     resource_coords = (1115 - 20 * len(str(resources.resources)), 25) # adjusts position based on # of digits
@@ -262,7 +274,7 @@ def display_grid(GameBoard: Board):
             )
         elif GameBoard.States[idx].wall is not None:
             board_like[idx].draw(
-                screen, bgcolor, image_path="Assets/wall.jpg", image_size=CELL_DIMENSIONS
+                screen, bgcolor, image_path="Assets/wall.png", image_size=CELL_DIMENSIONS
             )
         else:
             # no person, so just draw the cell with the background color
