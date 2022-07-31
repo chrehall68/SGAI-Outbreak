@@ -62,13 +62,13 @@ class Cell:
         self.borders = [top_line, bottom_line, left_line, right_line]
         self.cell_rect = pygame.Rect(top_left[0], top_left[1], width, height)
 
-    def draw(self, screen: pygame.Surface, bgcolor: pygame.Color, **kwargs) -> None:
+    def draw(self, screen: pygame.Surface, **kwargs) -> None:
         """
         Valid kwargs are
         image_path - str - the path to the image
         image_size - Tuple[int, int] - the size to scale the image to
         """
-        pygame.draw.rect(screen, bgcolor, self.cell_rect)
+        # pygame.draw.rect(screen, bgcolor, self.cell_rect) replaced bgcolor with img
         for border in self.borders:
             pygame.draw.rect(screen, self.border_color, border)
 
@@ -174,8 +174,8 @@ def display_options(GameBoard):
             if GameBoard.resources.resources < GameBoard.resources.costs[option]:
                 coordsdims = options[option] # list w/ [coords tuple, dims tuple]
                 pygame.draw.rect(screen, IMG_RED, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
-            else: #elif the move is selected: #** need to work on in separate branch
-                pygame.draw.rect(screen, IMG_GREEN, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
+            # else: #elif the move is selected: #** need to work on in separate branch
+                # pygame.draw.rect(screen, IMG_GREEN, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
         display_image(screen, "Assets/vax.png", VAX_DIMS, VAX_COORDS)
         display_image(screen, "Assets/wall.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
@@ -253,12 +253,21 @@ def display_grid(GameBoard: Board):
     """
     Draw the grid on the screen, as well as any people.
     """
+    imgx, imgy = CELL_DIMENSIONS
+    imgx = imgx * 0.95
+    imgy = imgy * 0.95
     for idx in range(GameBoard.columns * GameBoard.rows):
-        bgcolor = BACKGROUND
+        # bgcolor = BACKGROUND
         if idx in GameBoard.getSafeEdge():
-            bgcolor = VAX_COLOR
+            # bgcolor = VAX_COLOR
+            board_like[idx].draw(
+                screen, image_path="Assets/safe2-tile.png", image_size=(imgx, imgy)
+            )
         else:
-            bgcolor = CELL_COLOR
+            # bgcolor = CELL_COLOR
+            board_like[idx].draw(
+                screen, image_path="Assets/cobblestone3-tile.png", image_size=(imgx, imgy)
+            )
         person = GameBoard.personAtIdx(idx)
         if person is not None:
             # there is a person, so draw the person
@@ -270,15 +279,17 @@ def display_grid(GameBoard: Board):
             else:
                 image_path += IMAGE_ASSETS[0]
             board_like[idx].draw(
-                screen, bgcolor, image_path=image_path, image_size=PERSON_SIZE
+                screen, image_path=image_path, image_size=PERSON_SIZE
             )
-        elif GameBoard.States[idx].wall is not None:
+        elif GameBoard.States[idx].wall is not None and GameBoard.States[idx].wall.turnsLeft > 0: # draw wall depending on how many turnsleft
             board_like[idx].draw(
-                screen, bgcolor, image_path="Assets/wall.png", image_size=CELL_DIMENSIONS
+                screen, image_path=f"Assets/wall3-{GameBoard.States[idx].wall.turnsLeft}left.png", image_size=(imgx, imgy)
             )
         else:
             # no person, so just draw the cell with the background color
-            board_like[idx].draw(screen, bgcolor)
+            pass
+            # board_like[idx].draw(screen, bgcolor)
+            
 
 
 def display_cur_move(cur_move: List):
