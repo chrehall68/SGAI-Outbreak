@@ -1,5 +1,6 @@
 import pygame
 from Board import Board
+from Player import *
 import PygameFunctions as PF
 import random as rd
 from constants import *
@@ -30,17 +31,23 @@ running = True
 take_action = []
 playerMoved = False
 
+enemy_player = None
+if player_role == "Government":
+    enemy_player = ZombieMinimaxPlayer()
+    ai_player = GovernmentMinimaxPlayer()
+else:
+    enemy_player = GovernmentMinimaxPlayer()
+    ai_player = ZombieMinimaxPlayer()
 
+PF.initScreen(GameBoard)
 
-if SELF_PLAY:
-    PF.initScreen(GameBoard)
 
 while running:
     P = PF.run(GameBoard)
 
-    if SELF_PLAY:
-        if not playerMoved:
-            if not GameBoard.containsPerson(False):
+    if not playerMoved:
+        if SELF_PLAY:
+            if not GovernmentPlayer().get_move(GameBoard)[0]:
                 PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
                 PF.display_lose_screen()
                 running = False
@@ -100,45 +107,23 @@ while running:
                         playerMoved = True
                     take_action = []
 
-                elif take_action[0] == "heal" or take_action[0] == "bite" or take_action[0] == "wall":
+                elif (
+                    take_action[0] == "heal"
+                    or take_action[0] == "bite"
+                    or take_action[0] == "wall"
+                ):
                     result = GameBoard.actionToFunction[take_action[0]](take_action[1])
                     if result[0] is not False:
                         playerMoved = True
                     take_action = []
 
-        # Computer turn
+        # ai player as player 1
         else:
-            playerMoved = False
-            take_action = []
-
-            # Make a list of all possible actions that the computer can take
-            possible_actions = [
-                ACTION_SPACE[i]
-                for i in range(7)
-                if (i != 4 and i != 6 and player_role == "Government")
-                or (i != 5 and player_role == "Zombie")
-            ]
-            possible_move_coords = []
-            while len(possible_move_coords) == 0 and len(possible_actions) != 0:
-                print("possible actions are", possible_actions)
-                action = possible_actions.pop(rd.randint(0, len(possible_actions) - 1))
-                possible_move_coords = GameBoard.get_possible_moves(
-                    action, "Government" if player_role == "Zombie" else "Zombie"
-                )
-
-            # no valid moves, player wins
-            if len(possible_actions) == 0 and len(possible_move_coords) == 0:
-                print("no possible moves for the computer")
-                if player_role == "Zombie":
-                    print(
-                        f"The government ended with {GameBoard.resources.resources} resources"
-                    )
-                    print(
-                        f"The price of vaccination was {GameBoard.resources.costs['vaccinate']}, the price of curing was {GameBoard.resources.costs['cure']}, and the price of walls was {GameBoard.reources.costs['wall']}"
-                    )
+            action, move_coord = ai_player.get_move(GameBoard)
+            if not action:
                 PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
-                PF.display_win_screen()
                 running = False
+                PF.display_lose_screen()
                 continue
 
             # Select the destination coordinates
@@ -148,85 +133,26 @@ while running:
 
             # Implement the selected action
             GameBoard.actionToFunction[action](move_coord)
-    
-    
-            # Update the board's states
-            GameBoard.update()
+            playerMoved = True
+            continue
 
-        # Update the display
-        pygame.display.update()
-        pygame.time.wait(75)
-
+    # Computer turn
     else:
-        if epochs_ran % 100 == 0:
-            print("Board Reset!")
-            GameBoard = Original_Board  # reset environment
-        for event in P:
-            i = 0
-            r = rd.uniform(0.0, 1.0)
-            st = rd.randint(0, len(GameBoard.States) - 1)
-            state = GameBoard.QTable[st]
+        playerMoved = False
+        take_action = []
+        action, move_coord = enemy_player.get_move(GameBoard)
 
-            if r < gamma:
-                while GameBoard.States[st].person is None:
-                    st = rd.randint(0, len(GameBoard.States) - 1)
-            else:
-                biggest = None
-                for x in range(len(GameBoard.States)):
-                    arr = GameBoard.QTable[x]
-                    exp = sum(arr) / len(arr)
-                    if biggest is None:
-                        biggest = exp
-                        i = x
-                    elif biggest < exp and player_role == "Government":
-                        biggest = exp
-                        i = x
-                    elif biggest > exp and player_role != "Government":
-                        biggest = exp
-                        i = x
-                state = GameBoard.QTable[i]
-            b = 0
-            j = 0
-            ind = 0
-            for v in state:
-                if v > b and player_role == "Government":
-                    b = v
-                    ind = j
-                elif v < b and player_role != "Government":
-                    b = v
-                    ind = j
-                j += 1
-            action_to_take = ACTION_SPACE[ind]
-            old_qval = b
-            old_state = i
+        if not action:
+            PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
+            running = False
+            PF.display_win_screen()
+            continue
 
-            # Update
-            # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
-            reward = GameBoard.act(old_state, action_to_take)
-            ns = reward[1]
-            NewStateAct = GameBoard.QGreedyat(ns)
-            NS = GameBoard.QTable[ns][NewStateAct[0]]
-            # GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
-            if GameBoard.num_zombies() == 0:
-                print("winCase")
-            take_action = []
-            print("Enemy turn")
-            ta = ""
-            if player_role == "Government":
-                r = rd.randint(0, 5)
-                while r == 4:
-                    r = rd.randint(0, 5)
-                ta = ACTION_SPACE[r]
-            else:
-                r = rd.randint(0, 4)
-                ta = ACTION_SPACE[r]
-            poss = GameBoard.get_possible_moves(ta, "Zombie")
+        # Implement the selected action
+        GameBoard.actionToFunction[action](move_coord)
+        # Update the board's states
+        GameBoard.update()
 
-            if len(poss) > 0:
-                r = rd.randint(0, len(poss) - 1)
-                a = poss[r]
-                GameBoard.actionToFunction[ta](a)
-            if GameBoard.num_zombies() == GameBoard.population:
-                print("loseCase")
-            if event.type == pygame.QUIT:
-                running = False
+    # Update the display
+    pygame.display.update()
+    pygame.time.wait(75)
