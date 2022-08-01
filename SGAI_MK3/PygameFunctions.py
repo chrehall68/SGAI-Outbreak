@@ -86,8 +86,10 @@ class Cell:
                     self.top_left[1] + (self.height - img_dims[1]) // 2,
                 ),
             )
+
     def get_top_left(self):
         return self.top_left
+
 
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
@@ -173,8 +175,10 @@ def display_reset_move_button():
         RESET_MOVE_DIMS[1],
     )
     pygame.draw.rect(screen, BLACK, rect)
-    screen.blit(font.render("Reset move?", True, WHITE), 
-    (RESET_MOVE_COORDS[0] + 45, RESET_MOVE_COORDS[1] + 10))
+    screen.blit(
+        font.render("Reset move?", True, WHITE),
+        (RESET_MOVE_COORDS[0] + 45, RESET_MOVE_COORDS[1] + 10),
+    )
 
 
 def display_options(GameBoard):
@@ -214,7 +218,7 @@ def display_options(GameBoard):
         display_image(screen, "Assets/wall.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
         display_resources(GameBoard.resources)
         display_turns_left(GameBoard, GameBoard.count_vax_people())
-        #display_safe_zone(GameBoard.safeEdge)
+        # display_safe_zone(GameBoard.safeEdge)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_reset_move_button()
@@ -316,18 +320,20 @@ def display_grid(GameBoard: Board):
                 image_path += IMAGE_ASSETS[2]
             else:
                 image_path += IMAGE_ASSETS[0]
+            board_like[idx].draw(screen, image_path=image_path, image_size=PERSON_SIZE)
+        elif (  # draw wall depending on how many turnsleft
+            GameBoard.States[idx].wall is not None
+            and GameBoard.States[idx].wall.turnsLeft >= 0
+        ):
             board_like[idx].draw(
-                screen, image_path=image_path, image_size=PERSON_SIZE
-            )
-        elif GameBoard.States[idx].wall is not None and GameBoard.States[idx].wall.turnsLeft > 0: # draw wall depending on how many turnsleft
-            board_like[idx].draw(
-                screen, image_path=f"Assets/wall3-{GameBoard.States[idx].wall.turnsLeft}left.png", image_size=(imgx, imgy)
+                screen,
+                image_path=f"Assets/wall3-{min(GameBoard.States[idx].wall.turnsLeft+1, 3)}left.png",
+                image_size=(imgx, imgy),
             )
         else:
             # no person, so just draw the cell with the background color
             pass
             # board_like[idx].draw(screen, bgcolor)
-            
 
 
 def display_cur_move(cur_move: List):
@@ -390,14 +396,17 @@ def display_lose_screen():
             if event.type == pygame.QUIT:
                 return
 
-def display_turns_left(GameBoard : Board, turns_left):
+
+def display_turns_left(GameBoard: Board, turns_left):
     if len(turns_left) >= 1:
         for state in turns_left:
             coord = GameBoard.toCoord(state[0])
             screen.blit(
                 font.render(f"{state[1]}", True, WHITE),
-                (CELL_DIMENSIONS[0]*coord[0] + board_like[0].get_top_left()[0], 
-                CELL_DIMENSIONS[1]*coord[1] + board_like[0].get_top_left()[1])
+                (
+                    CELL_DIMENSIONS[0] * coord[0] + board_like[0].get_top_left()[0],
+                    CELL_DIMENSIONS[1] * coord[1] + board_like[0].get_top_left()[1],
+                ),
             )
 
 
