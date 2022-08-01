@@ -20,8 +20,8 @@ def initScreen(board: Board):
     screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
     pygame.display.set_caption("Outbreak!")
     pygame.font.init()
-    font = pygame.font.SysFont("Comic Sans", 20)
-    heading_font = pygame.font.SysFont("Helvetica", 45)
+    font = pygame.font.SysFont("Bahnschrift", 20)
+    heading_font = pygame.font.SysFont("Bahnschrift", 40)
     screen.fill(BACKGROUND)
     board_like = [
         Cell((LEFT_MARGIN + x * CELL_DIMENSIONS[0], TOP_MARGIN + y * CELL_DIMENSIONS[1]))
@@ -84,7 +84,8 @@ class Cell:
                     self.top_left[1] + (self.height - img_dims[1]) // 2,
                 ),
             )
-
+    def get_top_left(self):
+        return self.top_left
 
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
@@ -161,11 +162,11 @@ def display_reset_move_button():
         RESET_MOVE_DIMS[1],
     )
     pygame.draw.rect(screen, BLACK, rect)
-    screen.blit(font.render("Reset move?", True, WHITE), RESET_MOVE_COORDS)
+    screen.blit(font.render("Reset move?", True, WHITE), 
+    (RESET_MOVE_COORDS[0] + 45, RESET_MOVE_COORDS[1] + 10))
 
 def display_options(GameBoard):
     # Draw the options and highlight
-    print(GameBoard.resources.getCosts())
     if GameBoard.player_role == "Government":
         options = { "cure": [CURE_BITE_COORDS, CURE_BITE_DIMS],
                     "vaccinate": [VAX_COORDS, VAX_DIMS],
@@ -180,7 +181,7 @@ def display_options(GameBoard):
         display_image(screen, "Assets/vax.png", VAX_DIMS, VAX_COORDS)
         display_image(screen, "Assets/wall.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
         display_resources(GameBoard.resources)
-        #display_turns_left(Person.vaxTurnsLeft(), Wall.wallTurnsLeft())
+        display_turns_left(GameBoard, GameBoard.count_vax_people())
         #display_safe_zone(GameBoard.safeEdge)
     else:
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
@@ -296,13 +297,13 @@ def display_cur_move(cur_move: List):
     # Display the current action
     screen.blit(
         font.render("Your move is currently:", True, WHITE),
-        CUR_MOVE_COORDS,
+        (CUR_MOVE_COORDS[0], CUR_MOVE_COORDS[1] + 100),
     )
     screen.blit(
         font.render(f"{cur_move}", True, WHITE),
         (
             CUR_MOVE_COORDS[0],
-            CUR_MOVE_COORDS[1] + font.size("Your move is currently:")[1] * 2,
+            CUR_MOVE_COORDS[1] + font.size("Your move is currently:")[1] * 2 + 100,
         ),
     )
 
@@ -350,14 +351,15 @@ def display_lose_screen():
             if event.type == pygame.QUIT:
                 return
 
-def display_turns_left(vax, wall):
-    print(vax,wall)
-    turnsLeft = [f"Turns left on vaccination : {vax}", f"Turns left on wall : {wall}"]
-    for index in turnsLeft:
-        screen.blit(
-            font.render(turnsLeft[index], True, BLACK), (800,300+50*index),
-        )
-    pygame.display.update()
+def display_turns_left(GameBoard : Board, turns_left):
+    if len(turns_left) >= 1:
+        for state in turns_left:
+            coord = GameBoard.toCoord(state[0])
+            screen.blit(
+                font.render(f"{state[1]}", True, WHITE),
+                (CELL_DIMENSIONS[0]*coord[0] + board_like[0].get_top_left()[0], 
+                CELL_DIMENSIONS[1]*coord[1] + board_like[0].get_top_left()[1])
+            )
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
     if coord2[1] > coord1[1]:
