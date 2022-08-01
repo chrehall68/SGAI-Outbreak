@@ -336,7 +336,7 @@ class Board:
             return [False, None]
         if self.isAdjacentTo(coords, False) and self.resources.spendOn("cure"):
             # 80% chance of getting cured (for now, # can be changed)
-            chance = 0.0
+            chance = 0.8
             record_actions("curesGiven", actions_taken)
             if rd.random() < chance:
                 p.get_cured()
