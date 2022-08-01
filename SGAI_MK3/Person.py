@@ -49,6 +49,8 @@ class Person:
     def get_cured(self):
         self.isZombie = False
         self.wasCured = True
+        self.isVaccinated = True
+        self.turnsVaccinated = 5
 
     def update(self):
         if self.isVaccinated:
