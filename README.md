@@ -5,6 +5,9 @@ serious games and reinforcement learning.
 ## Team Courtney II
 The best team out there.
 
+## Data Submission
+After saving your `.csv` file submit the file [Here](https://forms.gle/LrCMzoAV3HU4VLUa9)
+
 ## Requirements
 For windows users use `pip3 install -r requirements.txt` to install all the requirements.
 For Macos users use `pip3 install -r macos_requirements.txt` to install all the requirements.
