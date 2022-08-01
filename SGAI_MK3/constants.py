@@ -25,10 +25,11 @@ CELL_COLOR = (218, 221, 161)  # old: (233, 222, 188)
 VAX_COLOR = (102, 255, 0)
 CELL_BORDER = 2
 IMAGE_ASSETS = [
-    "person_normal.png",
-    "person_vax.png",
-    "person_zombie.png",
+    "person.png",
+    "vaccinatedperson.png",
+    "person_zombie3.png",
 ]
+# person_normal.png, person_vax.png
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (50, 550)
 RESET_MOVE_DIMS = (200, 50)
@@ -56,4 +57,4 @@ COIN_BALANCE_COORDS = (1125, 25)
 MIN_WALL_DURATION = 1
 MAX_WALL_DURATION = 3
 
-PERSON_SIZE = (35, 60)
+PERSON_SIZE = (65, 80)

@@ -18,7 +18,7 @@ actions_taken = {
 
 def record_actions(a, d):
     d[a] += 1
-    # print(d)
+
 
 
 class Board:
@@ -64,6 +64,13 @@ class Board:
             if state.person is not None and state.person.isZombie == isZombie:
                 ret += 1
         return ret
+    
+    def count_vax_people(self):
+        states = []
+        for state in self.States:
+            if state.person is not None and state.person.isZombie == False and state.person.isVaccinated == True:
+                states.append([state.location, state.person.get_vax_turns_left()])
+        return states
 
     def num_zombies(self) -> int:
         return self.count_people(True)
