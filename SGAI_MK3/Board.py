@@ -6,6 +6,7 @@ from Wall import Wall
 from typing import List, Tuple
 from constants import *
 import random
+import time
 
 # for recording down cures/vaccines
 actions_taken = {
@@ -333,10 +334,11 @@ class Board:
             return [False, None]
         if self.isAdjacentTo(coords, False) and self.resources.spendOn("cure"):
             # 80% chance of getting cured (for now, # can be changed)
-            chance = 0.8
+            chance = 0.0
             record_actions("curesGiven", actions_taken)
             if rd.random() < chance:
                 p.get_cured()
+                self.telemetry = ""
             else:
                 self.telemetry = "Cure Failed!"
             return [True, i]

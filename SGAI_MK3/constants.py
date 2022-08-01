@@ -42,7 +42,7 @@ VAX_COORDS = (125, 200)
 VAX_DIMS = (75, 75)
 CELL_DIMENSIONS = (100, 100)  # number of pixels (x, y) for each cell
 CUR_MOVE_COORDS = (50, 300)
-TELEMETRY_COORDS = (50, 700)  # telemetry: feedback stuff ex) cure failed, etc.
+TELEMETRY_COORDS = (50, 650)  # telemetry: feedback stuff ex) cure failed, etc.
 
 MARGIN = 150  # Number of pixels to offset grid to the top-left side
 LEFT_MARGIN = 300

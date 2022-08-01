@@ -6,7 +6,7 @@ from Board import Board
 from Person import Person
 from Wall import Wall
 import csv
-
+import time
 
 # globals
 screen = None
@@ -153,14 +153,14 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     display_grid(GameBoard)  # Draw the grid and the people
-    screen.blit(  # name/action
-        heading_font.render(
-            "role: " + GameBoard.player_role,
-            True,
-            WHITE,
-        ),
-        (40, 25),
-    )
+    # screen.blit(  # name/action
+    #     heading_font.render(
+    #         "role: " + GameBoard.player_role,
+    #         True,
+    #         WHITE,
+    #     ),
+    #     (40, 25),
+    # )
     display_options(GameBoard)
     return pygame.event.get()
 
@@ -348,9 +348,11 @@ def display_cur_move(cur_move: List):
 def display_telemetry(telemetry: List):
     # display feedback
     screen.blit(
-        font.render(telemetry, True, TELEMETRY_RED),
+        heading_font.render(telemetry, True, TELEMETRY_RED),
         TELEMETRY_COORDS,
     )
+    if telemetry != "":
+        time.sleep(1)
 
 
 def display_win_screen():
