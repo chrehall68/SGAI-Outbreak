@@ -2,6 +2,9 @@
 *.pyc
 *.idea
 
+# csv files
+*.csv
+
 # tensorboard files
 *.v2  
 SGAI_MK3/checkpoint
