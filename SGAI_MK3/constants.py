@@ -18,7 +18,7 @@ CELL_BORDER = 2
 IMAGE_ASSETS = [
     "person_normal.png",
     "person_vax.png",
-    "person_zombie.png",
+    "person_zombie3.png",
 ]
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (50, 550)

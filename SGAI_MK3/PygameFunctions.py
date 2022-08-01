@@ -262,12 +262,12 @@ def display_grid(GameBoard: Board):
         if idx in GameBoard.getSafeEdge():
             # bgcolor = VAX_COLOR
             board_like[idx].draw(
-                screen, image_path="Assets/safe2-tile.png", image_size=(imgx, imgy)
+                screen, image_path="Assets/grass.png", image_size=(imgx, imgy)
             )
         else:
             # bgcolor = CELL_COLOR
             board_like[idx].draw(
-                screen, image_path="Assets/cobblestone3-tile.png", image_size=(imgx, imgy)
+                screen, image_path="Assets/grass2.png", image_size=(imgx, imgy)
             )
         person = GameBoard.personAtIdx(idx)
         if person is not None:
