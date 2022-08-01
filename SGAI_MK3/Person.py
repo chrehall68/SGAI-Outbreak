@@ -2,8 +2,7 @@ import random as rd
 import stable_baselines3 as sb3
 import numpy as np
 import torch
-import copy
-import math
+
 
 class Person:
     def __init__(self, iz: bool):
@@ -86,7 +85,8 @@ class Person:
         else:
             trained_model = sb3.PPO.load("./saved_zombie_models/ppov2.zip")
             obs = self._get_obs(position, gameboard)
-            value = trained_model.policy.predict_values(torch.Tensor([obs]))
+            value = trained_model.policy.predict_values(torch.Tensor(np.array([obs])))
+            value = value[0][0]
             action = trained_model.predict(obs)[0]
             ACTION_MAPPINGS = {
                 0: "movebiteUp",
@@ -99,20 +99,20 @@ class Person:
                 action_name, pos = a
             else:
                 action_name = "Not avaliable"
-                value = -math.inf
-                pos = -math.inf
+                value = float("-inf")
+                pos = float("-inf")
             return action_name, pos, value
-    
+
     def process(self, gameb, position, action_name):
-        gameboard = copy.deepcopy(gameb)
-        valid, new_pos = gameboard.actionToFunction["move" + action_name[8:]](
-            self.board.toCoord(self.agentPosition)
+        clone = gameb.clone(gameb.States, gameb.player_role)
+        valid, new_pos = clone.actionToFunction["move" + action_name[8:]](
+            gameb.toCoord(position)
         )
         if valid:
             action_name = "move" + action_name[8:]
-            return action_name, new_pos
+            return action_name, gameb.toCoord(position)
         else:  # bite variation
-            dest_coord = list(gameboard.toCoord(position))
+            dest_coord = list(clone.toCoord(position))
             if "Up" in action_name:
                 dest_coord[1] -= 1
             elif "Down" in action_name:
@@ -121,7 +121,7 @@ class Person:
                 dest_coord[0] += 1
             else:
                 dest_coord[0] -= 1
-            valid, _ = self.board.actionToFunction["bite"](dest_coord)
+            valid, _ = clone.actionToFunction["bite"](dest_coord)
             if valid:
                 action_name = "bite"
                 return action_name, dest_coord

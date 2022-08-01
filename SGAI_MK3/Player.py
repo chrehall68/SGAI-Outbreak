@@ -8,7 +8,6 @@ import random as rd
 import math
 
 
-
 class Player:
     """
     Base class for a player, takes
@@ -18,18 +17,24 @@ class Player:
     def __init__(self, player_name, verbose=False) -> None:
         self.player_name = player_name
         self.verbose = verbose
+        self.possible_actions = [
+            ACTION_SPACE[i]
+            for i in range(len(ACTION_SPACE))
+            if (ACTION_SPACE[i] != "bite" and self.player_name == "Government")
+            or (
+                ACTION_SPACE[i] != "cure"
+                and ACTION_SPACE[i] != "vaccinate"
+                and ACTION_SPACE[i] != "wall"
+                and self.player_name == "Zombie"
+            )
+        ]
 
     def get_all_possible_actions(
         self, board: Board
     ) -> Dict[str, List[Tuple[int, int]]]:
-        possible_actions = [
-            ACTION_SPACE[i]
-            for i in range(len(ACTION_SPACE))
-            if (i != 5 and self.player_name == "Government")
-            or (i != 4 and self.player_name == "Zombie")
-        ]
+
         ret = {}
-        for action in possible_actions:
+        for action in self.possible_actions:
             ret[action] = board.get_possible_moves(
                 action, "Zombie" if self.player_name == "Zombie" else "Government"
             )
@@ -37,12 +42,7 @@ class Player:
 
     def get_move(self, board: Board) -> Tuple[str, Tuple[int, int]]:
         # Make a list of all possible actions that the computer can take
-        possible_actions = [
-            ACTION_SPACE[i]
-            for i in range(len(ACTION_SPACE))
-            if (i != 5 and self.player_name == "Government")
-            or (i != 4 and self.player_name == "Zombie")
-        ]
+        possible_actions = self.possible_actions.copy()
         possible_move_coords = []
         while len(possible_move_coords) == 0 and len(possible_actions) != 0:
             if self.verbose:
@@ -111,18 +111,22 @@ class ZombieAIPlayer(ZombiePlayer):
         super().__init__()
 
     def get_move(self, board: Board) -> Tuple[str, Tuple[int, int]]:
+        print("zombie get move ai")
         best_action = None
-        best_value = -math.inf
+        best_value = float("-inf")
         best_pos = None
         for i in range(36):
-            if board.States[i].person.isZombie:
-                action, pos, value = board.States[i].person.get_best_move(board, i)
+            p = board.States[i].person
+            if p is not None and p.isZombie:
+                action, pos, value = p.get_best_move(board, i)
                 if value > best_value:
                     best_action = action
                     best_value = value
                     best_pos = pos
+        if best_pos is None:
+            print("using zombie minimax player")
+            action, best_pos = ZombieMinimaxPlayer().get_move(board)
         return best_action, best_pos
-
 
 
 class MiniMaxPlayer(Player):

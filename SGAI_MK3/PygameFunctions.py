@@ -24,7 +24,9 @@ def initScreen(board: Board):
     heading_font = pygame.font.SysFont("Bahnschrift", 40)
     screen.fill(BACKGROUND)
     board_like = [
-        Cell((LEFT_MARGIN + x * CELL_DIMENSIONS[0], TOP_MARGIN + y * CELL_DIMENSIONS[1]))
+        Cell(
+            (LEFT_MARGIN + x * CELL_DIMENSIONS[0], TOP_MARGIN + y * CELL_DIMENSIONS[1])
+        )
         for y in range(board.rows)
         for x in range(board.columns)
     ]
@@ -101,6 +103,12 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= CURE_BITE_COORDS[1]
         and pixel_y <= CURE_BITE_COORDS[1] + CURE_BITE_DIMS[1]
     )
+    vax_check = (
+        pixel_x >= VAX_COORDS[0]
+        and pixel_x <= VAX_COORDS[0] + VAX_DIMS[0]
+        and pixel_y >= VAX_COORDS[1]
+        and pixel_y <= VAX_COORDS[1] + VAX_DIMS[1]
+    )
     reset_move_check = (
         pixel_x >= RESET_MOVE_COORDS[0]
         and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
@@ -124,13 +132,16 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
 
     if heal_bite_check:
         if GameBoard.player_role == "Government":
-            return "heal"
+            return "cure"
         return "bite"
     elif reset_move_check:
         return "reset move"
     elif wall_check:
         if GameBoard.player_role == "Government":
             return "wall"
+    elif vax_check:
+        if GameBoard.player_role == "Government":
+            return "vaccinate"
     elif move_check:
         return board_x, board_y
     return None
@@ -142,14 +153,14 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     display_grid(GameBoard)  # Draw the grid and the people
-    screen.blit( # name/action
-            heading_font.render(
-                "role: " + GameBoard.player_role,
-                True,
-                WHITE,
-            ),
-            (40, 25),
-        )
+    screen.blit(  # name/action
+        heading_font.render(
+            "role: " + GameBoard.player_role,
+            True,
+            WHITE,
+        ),
+        (40, 25),
+    )
     display_options(GameBoard)
     return pygame.event.get()
 
@@ -165,18 +176,39 @@ def display_reset_move_button():
     screen.blit(font.render("Reset move?", True, WHITE), 
     (RESET_MOVE_COORDS[0] + 45, RESET_MOVE_COORDS[1] + 10))
 
+
 def display_options(GameBoard):
     # Draw the options and highlight
     if GameBoard.player_role == "Government":
-        options = { "cure": [CURE_BITE_COORDS, CURE_BITE_DIMS],
-                    "vaccinate": [VAX_COORDS, VAX_DIMS],
-                    "wall": [WALL_BUTTON_COORDS, WALL_BUTTON_DIMS]}
+        options = {
+            "cure": [CURE_BITE_COORDS, CURE_BITE_DIMS],
+            "vaccinate": [VAX_COORDS, VAX_DIMS],
+            "wall": [WALL_BUTTON_COORDS, WALL_BUTTON_DIMS],
+        }
         for option in options:
+            coordsdims = options[option]  # list w/ [coords tuple, dims tuple]
             if GameBoard.resources.resources < GameBoard.resources.costs[option]:
-                coordsdims = options[option] # list w/ [coords tuple, dims tuple]
-                pygame.draw.rect(screen, IMG_RED, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
-            # else: #elif the move is selected: #** need to work on in separate branch
-                # pygame.draw.rect(screen, IMG_GREEN, pygame.Rect(coordsdims[0][0], coordsdims[0][1], coordsdims[1][0], coordsdims[1][1]))
+                pygame.draw.rect(
+                    screen,
+                    IMG_RED,
+                    pygame.Rect(
+                        coordsdims[0][0],
+                        coordsdims[0][1],
+                        coordsdims[1][0],
+                        coordsdims[1][1],
+                    ),
+                )
+            else:  # elif the move is selected: #** need to work on in separate branch
+                pygame.draw.rect(
+                    screen,
+                    IMG_GREEN,
+                    pygame.Rect(
+                        coordsdims[0][0],
+                        coordsdims[0][1],
+                        coordsdims[1][0],
+                        coordsdims[1][1],
+                    ),
+                )
         display_image(screen, "Assets/cure.jpeg", CURE_BITE_DIMS, CURE_BITE_COORDS)
         display_image(screen, "Assets/vax.png", VAX_DIMS, VAX_COORDS)
         display_image(screen, "Assets/wall.png", WALL_BUTTON_DIMS, WALL_BUTTON_COORDS)
@@ -187,37 +219,42 @@ def display_options(GameBoard):
         display_image(screen, "Assets/bite.png", CURE_BITE_DIMS, CURE_BITE_COORDS)
     display_reset_move_button()
 
+
 def display_resources(resources):
-    resource_coords = (1115 - 20 * len(str(resources.resources)), 25) # adjusts position based on # of digits
+    resource_coords = (
+        1115 - 20 * len(str(resources.resources)),
+        25,
+    )  # adjusts position based on # of digits
     screen.blit(
         heading_font.render(f"{resources.resources}", True, WHITE),
         resource_coords,
     )
     display_image(screen, "Assets/coin.png", COIN_DIMS, COIN_BALANCE_COORDS)
 
-    costs = [["cure:", f"{resources.costs['cure']}"],
-            [f"vax:", f"{resources.costs['vaccinate']}"],
-            [f"walls:", f"{resources.costs['wall']}" ]]
+    costs = [
+        ["cure:", f"{resources.costs['cure']}"],
+        [f"vax:", f"{resources.costs['vaccinate']}"],
+        [f"walls:", f"{resources.costs['wall']}"],
+    ]
     for index in range(3):
-        screen.blit( # name/action
+        screen.blit(  # name/action
             heading_font.render(
                 costs[index][0],
                 True,
                 WHITE,
             ),
-            (925, 250 + 50*index),
+            (925, 250 + 50 * index),
         )
-        screen.blit( # price
+        screen.blit(  # price
             heading_font.render(
                 costs[index][1],
                 True,
                 WHITE,
             ),
-            (1050, 250 + 50*index),
+            (1050, 250 + 50 * index),
         )
         # coin img
         display_image(screen, "Assets/coin.png", (40, 40), (1080, 255 + 50 * index))
-
 
 
 def display_safe_zone(zone):
@@ -307,12 +344,14 @@ def display_cur_move(cur_move: List):
         ),
     )
 
+
 def display_telemetry(telemetry: List):
-    #display feedback
+    # display feedback
     screen.blit(
         font.render(telemetry, True, TELEMETRY_RED),
         TELEMETRY_COORDS,
     )
+
 
 def display_win_screen():
     screen.fill(BACKGROUND)
@@ -361,6 +400,7 @@ def display_turns_left(GameBoard : Board, turns_left):
                 CELL_DIMENSIONS[1]*coord[1] + board_like[0].get_top_left()[1])
             )
 
+
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
     if coord2[1] > coord1[1]:
         return "moveDown"
@@ -371,26 +411,30 @@ def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
     elif coord2[0] < coord1[0]:
         return "moveLeft"
 
-    
-def record_actions(a , d):
+
+def record_actions(a, d):
     d[a] += 1
 
 
 def csv_update(file_name, costs, moves):
 
-    header = ["cure", "vaccinate", "wall", "movesMade","curesGiven","vaccinationsGiven","wallsCreated"]
+    header = [
+        "cure",
+        "vaccinate",
+        "wall",
+        "movesMade",
+        "curesGiven",
+        "vaccinationsGiven",
+        "wallsCreated",
+    ]
 
     costs.update(moves)
     data = costs
 
-
-    with open(file_name, 'a', newline = '') as f:
+    with open(file_name, "a", newline="") as f:
         w = csv.DictWriter(f, header)
 
         if f.tell() == 0:
             w.writeheader()
-        
+
         w.writerow(data)
-
-
-

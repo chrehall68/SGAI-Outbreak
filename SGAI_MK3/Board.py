@@ -47,7 +47,8 @@ class Board:
             "moveDown": self.moveDown,
             "moveLeft": self.moveLeft,
             "moveRight": self.moveRight,
-            "heal": self.heal,
+            "cure": self.cure,
+            "vaccinate": self.vaccinate,
             "bite": self.bite,
             "wall": self.wall,
         }
@@ -116,8 +117,11 @@ class Board:
                     return True
             # try healing if person
             else:
-                if copy.heal(coord)[0]:
+                if copy.cure(coord)[0]:
                     return True
+
+        if copy.States[idx].person.isZombie and copy.vaccinate(coord)[0]:
+            return True
 
         return False
 
@@ -125,7 +129,7 @@ class Board:
         """
         Get the coordinates of people (or zombies) that are able
         to make the specified move.
-        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', 'heal', and 'wall')
+        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', 'cure', 'vaccinate', and 'wall')
         @param role - either 'Zombie' or 'Government'; helps decide whether an action
         is valid and which people/zombies it applies to
         """
@@ -137,24 +141,24 @@ class Board:
                 return poss
             for idx in range(len(self.States)):
                 state = self.States[idx]
+                coord = self.toCoord(idx)
                 if state.person is not None:
                     changed_states = False
-
                     if (
                         action == "bite"
                         and not state.person.isZombie
-                        and self.isAdjacentTo(self.toCoord(idx), True)
+                        and self.isAdjacentTo(coord, True)
                     ):
                         # if the current space isn't a zombie and it is adjacent
                         # a space that is a zombie
-                        poss.append(B.toCoord(idx))
+                        poss.append(coord)
                         changed_states = True
                     elif (
                         action != "bite"
                         and state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(idx))[0]
+                        and B.actionToFunction[action](coord)[0]
                     ):
-                        poss.append(B.toCoord(idx))
+                        poss.append(coord)
                         changed_states = True
 
                     if changed_states:
@@ -171,34 +175,23 @@ class Board:
                 return poss
             for idx in range(len(self.States)):
                 state = self.States[idx]
+                coord = B.toCoord(idx)
                 if state.person is not None:
                     changed_states = False
-                    if (
-                        action == "heal"
-                        and (
-                            state.person.isZombie
-                            or (
-                                not state.person.isVaccinated
-                                and idx in self.getSafeEdge()
-                            )
-                        )
-                        and (
-                            (state.person.isZombie and B.resources.spendOn("cure"))
-                            or (
-                                not state.person.isVaccinated
-                                and B.resources.spendOn("vaccinate")
-                            )
-                        )
-                    ):
-                        poss.append(B.toCoord(idx))
+                    if action == "cure" and B.cure(coord)[0]:
                         changed_states = True
-                    elif (
-                        action != "heal"
+                        poss.append(coord)
+                    elif action == "vaccinate" and B.vaccinate(coord)[0]:
+                        changed_states = True
+                        poss.append(coord)
+                    elif (  # move case
+                        action != "cure"
+                        and action != "vaccinate"
                         and action != "wall"
                         and not state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(idx))[0]
+                        and B.actionToFunction[action](coord)[0]
                     ):
-                        poss.append(B.toCoord(idx))
+                        poss.append(coord)
                         changed_states = True
 
                     if changed_states:
@@ -214,9 +207,9 @@ class Board:
                 elif (
                     action == "wall"
                     and state.wall is None
-                    and B.isAdjacentTo(B.toCoord(state.location), False)
+                    and B.isAdjacentTo(coord, False)
                 ):
-                    poss.append(B.toCoord(idx))
+                    poss.append(coord)
 
         return poss
 
@@ -326,46 +319,46 @@ class Board:
         self.States[i].person.get_bitten()
         return [True, i]
 
-    def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+    def cure(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         """
-        Cures or vaccinates the person at the stated coordinates.
-        If there is a zombie there, the person will be cured.
-        If there is a person there, the person will be vaccinated
-        If no person is selected, then return [False, None]
-        if a person is vaccinated, then return [True, index]
+        Cures the zombie at the stated coordinates
+        If no person/zombie is there, the person there is a person (not a zombie),
+        the zombie isn't adjacent to a person, or the government doesn't have
+        enough resources, then return [False, None]
+        Else, return [True, index]
         """
         i = self.toIndex(coords)
-        if self.States[i].person is None:
-            return [False, None]
         p = self.States[i].person
+        if self.States[i].person is None or not p.isZombie:
+            return [False, None]
+        if self.isAdjacentTo(coords, False) and self.resources.spendOn("cure"):
+            # 80% chance of getting cured (for now, # can be changed)
+            chance = 0.8
+            record_actions("curesGiven", actions_taken)
+            if rd.random() < chance:
+                p.get_cured()
+            else:
+                self.telemetry = "Cure Failed!"
+            return [True, i]
+        return [False, None]
 
-        if p.isZombie:
-            if self.isAdjacentTo(coords, False):  # zombie only cured if adjacent
-                if self.resources.spendOn("cure"):
-                    chance = (
-                        0.8  # 80% chance of getting cured (for now, # can be changed)
-                    )
-                    record_actions("curesGiven", actions_taken)
-                    if rd.random() < chance:
-                        p.get_cured()
-                    else:
-                        print("Cure Failed")
-                        self.telemetry = "Cure Failed!"
-                        pass
-                else:
-                    return [False, None]
-            else:
-                return [False, None]
-        else:
-            if i in self.getSafeEdge():
-                if self.resources.spendOn("vaccinate"):
-                    record_actions("vaccinationsGiven", actions_taken)
-                    p.get_vaccinated()
-                else:
-                    return [False, i]
-            else:
-                return [False, i]
-        return [True, i]
+    def vaccinate(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        """
+        Vaccinates the person at the stated coordinates.
+        If there is no person there, the person is a zombie,
+        the person is not in the safe edge, or the government
+        doesn't have enough resources, then return [False, None]
+        Else, return [True, index]
+        """
+        i = self.toIndex(coords)
+        p = self.States[i].person
+        if self.States[i].person is None or p.isZombie:
+            return [False, None]
+        if i in self.getSafeEdge() and self.resources.spendOn("vaccinate"):
+            record_actions("vaccinationsGiven", actions_taken)
+            p.get_vaccinated()
+            return [True, i]
+        return [False, None]
 
     def wall(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         i = self.toIndex(coords)
