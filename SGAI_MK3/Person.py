@@ -49,8 +49,6 @@ class Person:
     def get_cured(self):
         self.isZombie = False
         self.wasCured = True
-        self.isVaccinated= True
-        self.turnsVaccinated = 3
 
     def update(self):
         if self.isVaccinated:
@@ -58,6 +56,10 @@ class Person:
         if self.turnsVaccinated > 5:
             self.isVaccinated = False
             self.turnsVaccinated = 0
+    
+    def get_vax_turns_left(self):
+        if self.isZombie == False and self.isVaccinated:
+            return 6 - self.turnsVaccinated
 
     def __str__(self) -> str:
         return f"Person who is a zombie? {self.isZombie}"

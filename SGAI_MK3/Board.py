@@ -67,8 +67,8 @@ class Board:
     def count_vax_people(self):
         states = []
         for state in self.States:
-            if state.person is not None and state.person.isVaccinated == True:
-                states.append([state.location, 6-state.person.turnsVaccinated])
+            if state.person is not None and state.person.isZombie == False and state.person.isVaccinated == True:
+                states.append([state.location, state.person.get_vax_turns_left()])
         return states
 
     def num_zombies(self) -> int:
