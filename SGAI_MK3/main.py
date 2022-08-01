@@ -4,7 +4,6 @@ from Player import *
 import PygameFunctions as PF
 from constants import *
 from Board import actions_taken
-import time
 
 
 SELF_PLAY = True  # whether or not a human will be playing
@@ -35,6 +34,7 @@ while running:
     P = PF.run(GameBoard)
 
     if not playerMoved:
+        GameBoard.telemetry = "Your move!"
         if SELF_PLAY:
             if not dummy_player.get_move(GameBoard)[0]:
                 PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
@@ -80,9 +80,6 @@ while running:
                     running = False
 
             PF.display_cur_move(take_action)
-            PF.display_telemetry(GameBoard.telemetry)
-            time.sleep(1) # aaa isn't working idk if its just my computer
-
 
             # Action handling
             if len(take_action) > 1:
@@ -133,7 +130,6 @@ while running:
         playerMoved = False
         take_action = []
         action, move_coord = enemy_player.get_move(GameBoard)
-        GameBoard.telemetry = ""
 
         if not action:
             PF.csv_update("data.csv", GameBoard.resources.getCosts(), actions_taken)
@@ -148,7 +144,7 @@ while running:
         GameBoard.update()
 
     # Update the display
+    PF.display_telemetry(GameBoard.telemetry)
     pygame.display.update()
-    # time.sleep(1) # aaa isn't working idk if its just my computer
 
-    pygame.time.wait(75)
+    pygame.time.wait(200)

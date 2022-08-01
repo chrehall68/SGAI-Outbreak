@@ -6,7 +6,6 @@ from Board import Board
 from Person import Person
 from Wall import Wall
 import csv
-import time
 
 # globals
 screen = None
@@ -357,8 +356,6 @@ def display_telemetry(telemetry: List):
         heading_font.render(telemetry, True, TELEMETRY_RED),
         TELEMETRY_COORDS,
     )
-    if telemetry != "":
-        time.sleep(1)
 
 
 def display_win_screen():
